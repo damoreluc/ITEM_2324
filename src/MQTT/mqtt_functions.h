@@ -5,6 +5,8 @@
 #include <WiFi.h>
 #include <AsyncMqttClient.h>
 #include <MQTT/custom/mqtt_topics.h>
+#include <APPLICATION/SIM/sim_real_data_selector.h>
+#include <APPLICATION/SSD1306/ssd1306.h>
 
 /******************************************************************************
  * bunch of intermediata functions to ease MQTT support

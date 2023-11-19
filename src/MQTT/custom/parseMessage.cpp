@@ -1,44 +1,45 @@
 #include <MQTT/mqtt_functions.h>
 #include <MQTT/custom/custom.h>
 #include <MQTT/custom/mqtt_topics.h>
-#include <HWCONFIG/hwConfig.h>
+#include <APPLICATION\HWCONFIG\hwConfig.h>
+#include <APPLICATION\FSM\fsm.h>
+#include <APPLICATION\MCP6S26\pga.h>
 #include <APPLICATION/application.h>
 
-// operazioni da eseguire quando viene ricevuto un messaggio
-// viene richiamata da mqtt_onMqttMessage()
+// What to do when a message is received
+// is invoked by mqtt_onMqttMessage()
 void parseMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
 {
-    // bonifica del payload
-    // estrae solo i primi len caratteri del payload
-    char data[len + 1];
+    // payload clean up
+    // In a dynamic buffer, it extracts only the first len characters of the payload
+    char *data = (char *)malloc((len + 1) * sizeof(char));
     strncpy(data, payload, len);
+    // data is a C string: you have to end it with the terminator '\0'
+    data[len] = '\0';
 
     // print some information about the received message
     printRcvMsg(topic, payload, properties, len, index, total);
 
-    // da personalizzare
+    // to be customized...
 
-    // comando del led giallo
-    // è arrivato un messaggio da yellowOnOffTopic
-    if (strcmp(topic, subscribedTopics.get("yellowOnOffTopic").c_str()) == 0)
+    // MSF Acquisition Command
+    // A message arrived from triggerTopic
+    // ( 0 = Stop, 1 = OneShot, 2 = FreeRun )
+    if (strcmp(topic, subscribedTopics.get("triggerTopic").c_str()) == 0)
     {
-        // comanda on/off led giallo a partire dal payload
-        driveOnOffYellow(data);
+        // commands the MSF of data acquisition management
+        triggerFSM(data);
     }
 
-    // comando del led rosso
-    // è arrivato un messaggio da redOnOffTopic
-    else if (strcmp(topic, subscribedTopics.get("redOnOffTopic").c_str()) == 0) 
+    // PGA Gain Control
+    // A message arrived from pgaSetGainTopic
+    // it must be a value between 0 and 7; forced to 0 if out of range or non-numeric value
+    else if (strcmp(topic, subscribedTopics.get("pgaSetGainTopic").c_str()) == 0) 
     {
-        // comanda on/off led rosso a partire dal payload
-        driveOnOffRed(data);
-    }
+        // modifies the gain of the PGA MCP6S26
+        setPGAgain(data);
+    }  
 
-    // comando del led blu
-    // è arrivato un messaggio da blueOnOffTopic
-    else if (strcmp(topic, subscribedTopics.get("blueOnOffTopic").c_str()) == 0) 
-    {
-        // comanda on/off led blu a partire dal payload
-        driveOnOffBlue(data);
-    }    
+    // Release the dynamic buffer
+    free(data);
 }

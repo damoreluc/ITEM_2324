@@ -7,5 +7,7 @@
 
 #define WIFI_SSID "casa"
 #define WIFI_PASSWORD "crapapelatala"
+// #define WIFI_SSID "ITTCV_WIFI"
+// #define WIFI_PASSWORD "wifiittcv"
 
 #endif

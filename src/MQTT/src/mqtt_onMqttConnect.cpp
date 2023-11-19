@@ -10,6 +10,12 @@ void onMqttConnect(bool sessionPresent)
   Serial.print(F("Connected to MQTT. Client ID: "));
   Serial.println(mqttClient.getClientId());
 
+  if (getSensMode() == REAL_DATA)
+  {
+    ssd1306_publish("Connected to MQTT\n");
+    ssd1306_publish("System ready\n");
+  }
+
   // set RTOS timers to handle automatic reconnection to MQTT broker
   setTimersRTOS(4000);
 

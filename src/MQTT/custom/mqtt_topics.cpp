@@ -8,18 +8,32 @@ Dictionary<String, String> publishedTopics = Dictionary<String, String>();
 
 // compila il dizionario dei subscribed topics (da personalizzare)
 void compileSubTopics(Dictionary<String, String> &subTopics) {
-  // subscribed topic di comando del led giallo  
-  subTopics.set("yellowOnOffTopic", thisClient "/yellowTopic");
-  // subscribed topic di comando del led rosso
-  subTopics.set("redOnOffTopic", thisClient "/redTopic");
-  // subscribed topic di comando del led blu
-  subTopics.set("blueOnOffTopic", thisClient "/blueTopic");
+  // subscribed topic di comando del guadagno del PGA
+  subTopics.set("pgaSetGainTopic", thisClient "/pgaSetGain");
+  // subscried topic di comando della MSF (one-shot, free-run, stop)
+  subTopics.set("triggerTopic", thisClient "/trigger");  
   // subscribed topic per stampa messaggi
-  subTopics.set("inputTopic", thisClient "/input");
+  subTopics.set("inTopic", thisClient "/inTopic");
 }
 
 // compila il dizionario dei published topics (da personalizzare)
 void compilePubTopics(Dictionary<String, String> &pubTopics) {
-  // topic di pubblicazione messaggi
-  pubTopics.set("outTopic", thisClient "/output");
-}
+  // topic di pubblicazione spettro accelerometro 0
+  pubTopics.set("outTopic0", thisClient "/FFTBinTopic0");
+  // topic di pubblicazione spettro accelerometro 1
+  pubTopics.set("outTopic1", thisClient "/FFTBinTopic1");
+  // topic di pubblicazione valore RTD1
+  pubTopics.set("outTopic2", thisClient "/RTD1BinTopic"); 
+  // topic di pubblicazione stato RTD1
+  pubTopics.set("outTopic3", thisClient "/RTD1FaultTopic"); 
+  // topic di pubblicazione valore RTD2
+  pubTopics.set("outTopic4", thisClient "/RTD2BinTopic"); 
+  // topic di pubblicazione stato RTD2
+  pubTopics.set("outTopic5", thisClient "/RTD2FaultTopic"); 
+  // topic di pubblicazione conteggio campioni ADC coppia/velocità
+  pubTopics.set("outTopic6", thisClient "/CountAdcTopic");
+  // topic di pubblicazione valori coppia/velocità
+  pubTopics.set("outTopic7", thisClient "/TorqueSpeedTopic");
+  // topic di pubblicazione valore attuale del guadagno PGA
+  pubTopics.set("pgaGetGainTopic", thisClient "/pgaGetGain");
+  }

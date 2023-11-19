@@ -1,23 +1,26 @@
-# WiFi Esempio 05: <br>template di client MQTT con connessione a rete WiFi
+# Progetto ITEM: <br>refactoring firmware per ESP32
 
-Il progetto è un modello base per realizzare un client MQTT. Va considerato come riferimento per progetti più articolati basati sul protocollo MQTT su ESP32.
+## Repository del progetto ITEM - Banco prova riduttori meccanici
 
-Impiega la libreria `AsyncMqttClient` (link: https://github.com/OttoWinter/async-mqtt-client)
+Progetto base: __Git_ESP32_Devkit_ADS1256_FFT_SIMUL_RTD_SSD1306_count_AsyncMQTT_binary_05__
 
-(vedi anche https://github.com/khoih-prog/AsyncMQTT_ESP32 con documentazione più completa)
+### Firmware per ESP32
 
-L'esempio accetta quattro subscribed topics:
+Il codice è sviluppato con il framework Arduino in ambiente VS Code/PlatformIO.
 
-* `ESP32_base/yellowTopic`  per il comando del led giallo
-* `ESP32_base/redTopic`  per il comando del led rosso
-* `ESP32_base/blueTopic`  per il comando del led blu 
-* `ESP32_base/input`    per la stampa di un messaggio di testo sulla console seriale
+## La versione corrente supporta le seguenti funzionalità:
 
-e pubblica sul topic:
-
-* `ESP32_base/output`
-
-un testo che rappresenta lo stato attuale di un pulsante.
+1. Acquisizione dei due ingressi analogici per [accelerometri piezo elettrici IEPE](https://www.allaboutcircuits.com/technical-articles/introduction-to-piezoelectric-accelerometers-with-integral-electronics-piezo-electric-iepe-sensor/)
+2. Impiego dell'amplificatore a guadagno programmabile [MCP6S26](https://www.microchip.com/en-us/product/MCP6S26#) con multiplexer analogico per la selezione del canale accelerometrico e la regolazione del guadagno
+3. Impiego del convertitore analogico digitale [ADS1256](https://www.ti.com/product/ADS1256) con risoluzione di 24 bit 
+4. Campionamento di ciascun canale accelerometrico a 7500 Sa/s
+5. Calcolo dello spettro delle ampiezze di ciascun canale accelerometrico su 4096 campioni, risoluzione in frequenza 1,83Hz
+6. Acquisizione di 4 canali analogici con ampiezza +/-10V per i due segnali di coppia e i due segnali di velocità mediante ADC [MCP3204](https://www.microchip.com/en-us/product/MCP3204), risoluzione di 12 bit, frequenza di campionamento 100 Sa/s
+7. Acquisizione di due segnali di temperatura tramite trasduttori RTD PT1000 e moduli di condizionamento e conversione [Adafruit PT1000 RTD Temperature Sensor Amplifier - MAX31865](https://www.adafruit.com/product/3648)
+8. Visualizzazione locale dello stato di funzionamento tramite display OLED [SSD1306](https://nettigo.eu/system/images/3580/original.JPG?1578141142) con interfaccia I2C
+9. Connessione alla rete dati mediante Wifi
+10. Trasmissione dei dati telemetrici mediante protocollo [MQTT](https://www.hivemq.com/mqtt-essentials/) su broker a scelta: [mosquitto](https://test.mosquitto.org/) remoto o locale, [shiftr.io](https://www.shiftr.io/)
+11. Gestione da remoto tramite messaggi MQTT
 
 ---
 
@@ -37,7 +40,7 @@ Per il controllo dello stato della connessione vengono adoperati gli eventi dell
 
 Vengono gestite le situazioni di perdita di connessione mediante riconnessione automatica.
 
-Il pin `23` viene impiegato come uscita digitale per indicare la connessione all'access point wiFi. Per configurare un'altra posizione del led, modificare il parametro `pinWiFiConnected` nel file `HWCONFIG\hwConfig.h`
+~~Il pin `23` viene impiegato come uscita digitale per indicare la connessione all'access point wiFi. Per configurare un'altra posizione del led, modificare il parametro `pinWiFiConnected` nel file `HWCONFIG\hwConfig.h`~~
 
 ---
 
@@ -82,178 +85,47 @@ Nel file `main.cpp` includere __il solo__ file prescelto di accesso al broker, a
  // #include <MQTT/broker/mosquitto.h>
 ```
 
-__IMPORTANTE__: __NON__ includere più di un file di definizione del broker.
+## Identificativo MQTT della scheda ESP32
 
-## DEFINIZIONE DEI SUBSCRIBED E DEI PUBLISHING TOPICS
-
-In base all'applicazione da creare, vanno definiti i _topics_ a cui il client deve iscriversi per ricevere dati o comandi da remoto.
-
-Il client MQTT deve possedere un nome __univoco__ sul broker. Nel file `MQTT\custom\mqtt_topics.h`
-viene dichiarato il nome univoco, che è possibile personalizzare:
+Nel file `src\MQTT\custom\clientID.h` è definita la tag `thisClient` che identifica tutti i messaggi MQTT pubblicati da o destinati a questa scheda di acquisizione. Modificarlo in base alle proprie esigenze.
 
 ```C
-  // MQTT client ID
-  #define thisClient "ESP32_base"
+// MQTT client ID
+#define thisClient "ESP32DevKit123" //"ESP32Udine"
+
 ```
 
-Vanno poi definiti i topic sui quali il client pubblica dati verso il broker.
+## Elenco dei Topics MQTT impiegati
 
-Allo scopo vengono impiegati due dizionari:
+L'elenco di tutti i topics è dichiarato nel file `mqtt_topics.cpp`  
+in questo file modificare o aggiungere solo il nome del topic, non rimuovere la tag **_thisClient_**
 
-* per i _subscribed topics_ ("ingressi" per il client):  `subscribedTopics`
-* per i _publishing topics_ ("uscite" del client):  `publishedTopics`
+Ogni topic è nella forma sintattica: `identificativo_MQTT_scheda/nome_topic` ad esempio: `ESP32DevKit123/trigger`
 
-Entrambi i dizionari hanno la struttura:  `<chiave>, <valore>` entrambe le voci sono di tipo `String`.
+**Nota:** il testo dei topics è _case sensitive_.
 
-* Con `<chiave>` si indica un nome semplice da assegnare al topic
-* Il `<valore>` contiene il _persorso logico_ del topic.
+Il controllo remoto della ESP32 avviene tramite i seguenti _subscribed topics_ :
 
+| nome_topic | Tipo | Valori | Descrizione |
+|:--:|:---:|:---:|----|
+| /trigger | stringa | 0, 1, 2 | Controlla la MSF delle acquisizioni. <ul><li>0: Fine acquisizione</li><li>1: Singola acquisizione</li><li>2: Acquisizione ciclica</li> </ul>|
+| /pgaSetGain | stringa | 0..7 | Controlla il guadagno del PGA: <ul><li>0: Guadagno x 1</li><li>1: Guadagno x 2</li><li>2: Guadagno x 4</li><li>3: Guadagno x 5</li><li>4: Guadagno x 8</li><li>5: Guadagno x 10</li><li>6: Guadagno x 16</li><li>7: Guadagno x 32</li> </ul>|
 
-La personalizzazione va svolta nel file `MQTT\custom\mqtt_topics.cpp`
+La scheda ESP32 comunica la telemetria attraverso i seguenti _published topics_ :
 
-* Per i topic in ingresso (_Subscribed topics_) modificare la funzione:
+| nome_topic | Tipo | Note | Descrizione |
+|:--:|:---:|:---:|----|
+| /FFTBinTopic0 | array di valori float in forma binaria, <br> _little-endian_ | due messaggi consecutivi da 4096 byte ciascuno [^1] | contiene i 2048 moduli dello spettro dell'accelerazione sul canale 0 |
+| /FFTBinTopic1 | array di valori float in forma binaria, <br> _little-endian_ | due messaggi consecutivi da 4096 byte ciascuno [^1] | contiene i 2048 moduli dello spettro dell'accelerazione sul canale 1 |
+| /RTD1BinTopic | stringa |  | temperatura in °C rilevata dalla RTD1 |
+| /RTD2BinTopic | stringa |  | temperatura in °C rilevata dalla RTD2 |
+| /RTD1FaultTopic | stringa |  | messaggio diagnostico dal modulo RTD1 <ul><li>Ok</li><li>RTD High Threshold</li><li>RTD Low Threshold</li><li>REFIN- > 0.85 x Bias</li><li>REFIN- < 0.85 x Bias - FORCE- open</li><li>RTDIN- < 0.85 x Bias - FORCE- open</li><li>Under/Over voltage</li></ul> |
+| /RTD2FaultTopic | stringa |  | messaggio diagnostico dal modulo RTD2 <ul><li>Ok</li><li>RTD High Threshold</li><li>RTD Low Threshold</li><li>REFIN- > 0.85 x Bias</li><li>REFIN- < 0.85 x Bias - FORCE- open</li><li>RTDIN- < 0.85 x Bias - FORCE- open</li><li>Under/Over voltage</li></ul> |
+| /CountAdcTopic | stringa |   | numero di campionamenti acquisiti sui canali coppia/velocità |
+| /TorqueSpeedTopic | array di valori float in forma binaria, <br> _little-endian_ | un messaggio con 4 x CountAdcTopic elementi | contiene i campioni dei due canali di coppia e dei due canali di velocità, nel formato seguente <br> \[campioni coppia 1\]\[campioni coppia 2\]\[campioni velocità 1\]\[campioni velocità 2\]  |
+| /pgaGetGain | stringa  |   | valore attuale del guadagno impostato sul PGA  |
 
-```C
-  void compileSubTopics(Dictionary<String, String> &subTopics)
-```
-
-* Per i topic in uscita (_Published topics_) modificare la funzione:
-
-```C
-  void compilePubTopics(Dictionary<String, String> &pubTopics)
-```
-
-__Procedere nell'ordine:__
-
-1. definire quali informazioni la scheda ESP32 dovrà ricevere dal broker e associare i subscribed topics, definendo un nome univoco (chiave) per ciascun topic e il suo percorso sul broker.<br>
-Ad esempio: si vuole accendere/spegnere da remoto un led giallo collegato alla ESP32;
-    * si definisce il _subscribed topic_ con nome (chiave) `"yellowOnOffTopic"`
-    * con percorso  `"ESP32_base/yellowTopic"` 
-    * da questo topic arriverà la stringa `"0"` per spegnere il led, o la stringa `"1"` per accenderlo.
-
-2. in modo simile, definire quali informazioni la scheda ESP32 pubblicherà verso il broker e associare i publisher topics, definendo un nome univoco per ciascun topic e il suo percorso sul broker.<br>
-Ad esempio: si vuole notificare in remoto che un pulsante è stato premuto o rilasciato;
-    * si definisce il _published topic_ con nome `"outTopic"`
-    * con percorso  `"ESP32_base/output"`
-    * su questo topic la ESP32 invierà un messaggio sullo stato del pulsante
-
-3. per i subscribed topics, nella funzione `compileSubTopics()` aggiungere il topic al dizionario dei subscribed topics mediante il comando:
-
-```C
-   // subscribed topic di comando del led giallo  
-   subTopics.set("yellowOnOffTopic", thisClient "/yellowTopic");
-```
-
-4. ripetere il punto 3. per ciascun _subscribed topic_ richiesto dalla applicazione
-5. per i _publishing topic_, nella funzione `compilePubTopics()` aggiungere il topic al dizionario dei published topics mediante il comando:
-
-```C
-   // topic di pubblicazione messaggi
-   pubTopics.set("outTopic", thisClient "/output");
-```
-
- 6. ripetere il punto 5. per ciascun _published topic_ richiesto dalla applicazione.
-
-All'avvio del client MQTT verranno automaticamente registrati sul broker i subscribed topics.
-
-## PARSING DEI SUBSCRIBED TOPICS
-
-Il client MQTT gestisce il traffico col broker in modo _asincrono_, non è necessario che il programmatore della applicazione si preoccupi delle fasi di ricezione o di trasmissione dei dati sui topics.
-
-E' invece __responsabilità del programmatore__ decidere cosa fare quando viene ricevuto un messaggio su un subscribed topic.
-
-Nel file     `MQTT\custom\parseMessage.cpp`
-
-va personalizzata la funzione    `parseMessage()`
-
-Rifacendosi al caso del led giallo illustrato più sopra, nella `parseMessage()` si andrà a:
-
-1. verificare se si tratta del __topic__ descritto dalla chiave `"yellowOnOffTopic"` allora si passa il contenuto del payload alla funzione ausiliaria __programmata dallo sviluppatore__ che gestirà l'informazione:
-
-```C
-// operazioni da eseguire quando viene ricevuto un messaggio
-// viene richiamata da mqtt_onMqttMessage()
-void parseMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
-{
-    // bonifica del payload
-    // estrae solo i primi len caratteri del payload
-    char data[len + 1];
-    strncpy(data, payload, len);
-
-    // print some information about the received message
-    printRcvMsg(topic, payload, properties, len, index, total);
-
-    // da personalizzare
-
-    // comando del led giallo
-    // è arrivato un messaggio da yellowOnOffTopic
-    if (strcmp(topic, subscribedTopics.get("yellowOnOffTopic").c_str()) == 0)
-    {
-        // comanda on/off led giallo a partire dal payload
-        driveOnOffYellow(data);
-    }
-}
-```
-
-2. nella funzione ausiliaria, se il __payload__ è la stringa `"0"` viene comandato lo spegnimento del led giallo altrimenti se il __payload__ è la stringa `"1"` viene comandata l'accensione del led giallo.
-
-La struttura del codice corrispondente è:
-
-```C
-#include <APPLICATION/application.h>
-#include <HWCONFIG/hwConfig.h>
-
-// comanda on/off led giallo a partire dal payload
-void driveOnOffYellow(char *data)
-{
-    if (strncmp(data, "0", 1) == 0)
-    {
-        digitalWrite(pinYellow, LOW);
-        Serial.println("led giallo spento");
-    }
-    else if (strncmp(data, "1", 1) == 0)
-    {
-        digitalWrite(pinYellow, HIGH);
-        Serial.println("led giallo acceso");
-    }
-}
-```
-
-__NOTA__: nelle operazioni di confronto tra stringhe del payload (trattate come _array di char_) è consigliato utilizzare la funzione di confronto `strncmp()` specificando esattamente il numero di caratteri da confrontare.
-
-## PUBBLICAZIONE DI UN DATO SUI PUBLISHING TOPICS
-
-Anche la pubblicazione di un dato dalla ESP32 verso il broker viene gestita in modalità asincrona dai layers della libreria MQTT.
-
-Nella applicazione è sufficiente che il programmatore utilizzi il metodo `mqttClient.publish()` ogni qual volta desidera pubblicare una informazione su un particolare topic.
-
-Il metodo `mqttClient.publish()` richiede i seguenti parametri:
-
-* il topic sul quale pubblicare, ad esempio `"ESP32_base/output"`
-* il livello di QOS (ad esempio 0)
-* se il messaggio è di tipo retain o no
-* il payload da trasmettere (ad esempio un array di char contenente un testo)
-* la dimensione _in byte_ del payload
-
-e ritorna il _packet ID_ (diverso da 0) del messaggio se è stato in grado di inserire il payload nella coda dei messaggi da pubblicare verso il broker, altrimenti restituisce il codice di errore 0.
-
-Ad esempio, per pubblicare lo stato del pulsante, il programmatore può scrivere:
-
-```C
-  if (button.fell())
-  {
-    const char msgButton[] = "Pulsante premuto";
-    Serial.println(msgButton);
-
-    // pubblica sul topic outTopic
-    if(mqttClient.connected()) {
-      uint16_t res = 0;
-      res = mqttClient.publish(publishedTopics.get("outTopic").c_str(),0,false, msgButton, strlen(msgButton));
-    }
-  }
-```
-
-Si osservi che il payload (l'informazione inviata sul canale definito dal topic) verrà trattata dai layers di basso livello come __array di byte__. Pertanto il payload può anche essere un `int`, un `float` o un tipo dati definito dall'utente, purché sia determinabile la sua dimensione in byte e che il tipo dati sia _riconoscibile_ e _gestibile_ da chi riceverà l'informazione dall'altro lato del broker.
+[^1]:  il primo elemento del primo messaggio viene cambiato di segno (sarà sempre negativo) per consentire a chi riceve di discriminare il primo messaggio dal secondo messaggio e ricostruire l'ordine dei 4096+4096 byte, altrimenti lo spettro delle ampiezze potrebbe risultare traslato di metà banda passante.
 
 ---
 

@@ -4,6 +4,8 @@
 #include <Arduino.h>
 #include <WIFI/credentials.h>
 #include <WiFi.h>
+#include <APPLICATION/SSD1306/ssd1306.h>
+#include <APPLICATION\SIM\sim_real_data_selector.h>
 
 // configura il modulo WiFi come STATION
 // e si connette ad un Access Point con le credenziali
