@@ -17,15 +17,15 @@ void sampleMCP3204(void *pvParameters)
     if (mcp3204_BufferAvailable() > 0)
     {
 
-      mcp3204_getAllVoltage(vspi, CS_MCP3204, &mcp3204_dati);
+     // mcp3204_getAllVoltage(vspi, CS_MCP3204, &mcp3204_dati);
 
       /*
        * debug
        */
-      // mcp3204_dati.volt0 = 0.5;
-      // mcp3204_dati.volt1 = 1.0;
-      // mcp3204_dati.volt2 = 1.5;
-      // mcp3204_dati.volt3 = 2.0;
+      mcp3204_dati.volt0 = 2.5;
+      mcp3204_dati.volt1 = 3.0;
+      mcp3204_dati.volt2 = 1.5;
+      mcp3204_dati.volt3 = 2.0;
       /*
        * fine debug
        */
