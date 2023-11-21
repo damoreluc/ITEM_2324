@@ -4,6 +4,9 @@
 
 #define ADS1256_ADCON 0x02
 
+// creation of queue for ADS1256 ADC data acquisition from ISR
+QueueHandle_t xQueueADS1256Sample;
+
 // constructor
 ADS1256Ext::ADS1256Ext() : ADS1256() {} 
 
@@ -42,4 +45,4 @@ ADS1256Ext adc;
 
 // ADS1256 DRDY
 volatile bool newData = false;
-volatile uint16_t countData = 0;
+volatile int32_t countData = 0;

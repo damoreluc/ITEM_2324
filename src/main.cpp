@@ -278,6 +278,9 @@ void setup()
   Serial.begin(115200);
   bootMsg(mqttServer, subscribedTopics, publishedTopics);
 
+  // creation of queue for ADS1256 ADC data acquisition from ISR
+  xQueueADS1256Sample = xQueueCreate(ADS1256QueueSize, sizeof(int32_t));
+
   // creation of queue for MCP3204 ADC data publication
   xQueueCountADCTorque = xQueueCreate(2, sizeof(uint32_t));
 

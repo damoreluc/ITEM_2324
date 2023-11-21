@@ -68,13 +68,13 @@ void fsm()
         if (getSensMode() == REAL_DATA)
         {
             // modalità SPI per transazioni con MCP3204 e MCP6S26
-           // vspi.beginTransaction(SPISettings(MCP3204_SPI_CLOCK, MSBFIRST, SPI_MODE0));
+            // vspi.beginTransaction(SPISettings(MCP3204_SPI_CLOCK, MSBFIRST, SPI_MODE0));
 
             //  uso il MUX del pga MCP6S26 per il multiplexing dei due ingressi accelerometrici verso ADS1256
-          //  pga0.channel = pga0_channels[MCP6S26_current_channel_index];
-          //  mcp6s26_setChannel(vspi, CS_PGA0, pga0.channel);
+            //  pga0.channel = pga0_channels[MCP6S26_current_channel_index];
+            //  mcp6s26_setChannel(vspi, CS_PGA0, pga0.channel);
             // eventuale aggiornamento del guadagno del pga MCP6S26
-         //   if (pga0.gain_changed)
+            //   if (pga0.gain_changed)
             // {
             //     pga0.gain_changed = false;
             //     mcp6s26_setGain(vspi, CS_PGA0, pga0.gain);
@@ -83,9 +83,9 @@ void fsm()
 
             //     delay(5);
             // }
-            
+
             // avvio dell'ADC ADS1256 per acquisizione accelerometri
-           // adc.wakeup();
+            // adc.wakeup();
             // associa l'interrupt esterno di nDRDY alla sua ISR
             attachInterrupt(nDRDY, ISR_DRDY, FALLING);
         }
@@ -99,12 +99,15 @@ void fsm()
         // acquisizione di un canale accelerometrico dall'ADC ADS1256
         if (getSensMode() == REAL_DATA)
         {
-
-            if (newData) // settato dalla ISR su DRDY dell'ADS1256
+            int32_t sampleFromISR;
+            if (xQueueReceive(xQueueADS1256Sample, (void *)&sampleFromISR, 0) == pdTRUE)
+            //if (newData) // settato dalla ISR su DRDY dell'ADS1256
             {
+                sampleFromISR = sampleFromISR % FFT_SIZE;
+
                 Serial.print("Sample n. ");
-                Serial.println(sampleCounter);
-                
+                Serial.println(sampleFromISR);
+
                 newData = false;
 
                 if (sampleCounter < FFT_SIZE)
@@ -112,7 +115,7 @@ void fsm()
                     // get ADS1256 new sample
                     // adcValue = (float)adc.ReadRawData();
                     // real_fft_plan->input[sampleCounter] = adc.volt(adcValue);
-                    real_fft_plan->input[sampleCounter] = (sampleCounter%41) * 5.0 / FFT_SIZE;
+                    real_fft_plan->input[sampleCounter] = (sampleFromISR % 41) * 5.0 / FFT_SIZE;
                     sampleCounter++;
                     numberOfAds1256Cycles++;
 
@@ -131,10 +134,10 @@ void fsm()
                 {
                     detachInterrupt(nDRDY);
                     //  ferma il campionamento al completamento del numero di campioni
-                  //  adc.standby();
+                    //  adc.standby();
 
                     // termina la transazione SPI conl'adc MCP3204
-                 //   vspi.endTransaction();
+                    //   vspi.endTransaction();
 
                     // // debug: campioni persi?
                     // Serial.print("campioni memorizzati: ");
@@ -195,7 +198,7 @@ void fsm()
 
         // read RTD1 and store result into xQueueRTD1
         //++ dati RTD simulati
-    //    readRTD();
+        //    readRTD();
 
         // push count ADC into xQueueCountAdcTorque
         if (uxQueueSpacesAvailable(xQueueCountADCTorque) > 0)

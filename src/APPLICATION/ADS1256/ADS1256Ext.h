@@ -4,6 +4,11 @@
 #include <Arduino.h>
 #include <APPLICATION\ADS1256\ADS1256.h>
 
+#define ADS1256QueueSize 100
+
+// creation of queue for ADS1256 ADC data acquisition from ISR
+extern QueueHandle_t xQueueADS1256Sample;
+
 class ADS1256Ext : public ADS1256 {
     public: 
         ADS1256Ext();  // constructor
@@ -18,6 +23,6 @@ extern ADS1256Ext adc;
 
 // ADS1256 DRDY
 extern volatile bool newData;
-extern volatile uint16_t countData;
+extern volatile int32_t countData;
 
 #endif
