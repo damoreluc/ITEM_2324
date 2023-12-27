@@ -1,4 +1,10 @@
 /*
+  valutare finestratura dei campioni dellìADS1256
+  con una finestra di Welch lunga FFT_SIZE punti:
+  link: https://www.recordingblogs.com/wiki/welch-window
+*/
+
+/*
  * WiFi Esempio 05: template di client MQTT con connessione a rete WiFi
  *
  * Il progetto è un modello base per realizzare un client MQTT. Va considerato come riferimento
@@ -307,7 +313,7 @@ void setup()
 
     // setup RTD1 and RTD object: set to 2WIRE, 3WIRE or 4WIRE as necessary
     ssd1306_publish("Setup RTD1/2\n");
-    //setupRTD();
+    setupRTD();
 
     delay(500);
 
@@ -317,13 +323,13 @@ void setup()
     //  NB: HSPI clock <= F_clkin / 4 = 7.68e6 / 4 = 1920000
     ssd1306_publish("Setup ADS1256\n");
     pinMode(nDRDY, INPUT_PULLUP);
-    //adc.setup();
+    adc.setup();
 
     Serial.println(F("PGA MCP6S26 Configuration"));
     ssd1306_publish("Setup PGA\n");
 
     // PGA initial setup PGA
-    //mcp6s26_setup();
+    mcp6s26_setup();
 
     Serial.println(F("ADC & PGA Configuration Completed"));
 

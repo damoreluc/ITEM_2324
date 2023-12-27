@@ -49,8 +49,8 @@ void WiFiEvent(WiFiEvent_t event)
         break;
     case ARDUINO_EVENT_WIFI_STA_START:
         Serial.println(F("WiFi client started"));
-  if (getSensMode() == REAL_DATA)
-  {
+        if (getSensMode() == REAL_DATA)
+        {
             ssd1306_publish("Connecting to Wi-Fi\n");
             char s[21] = "";
             sprintf(s, "MAC %s\n", WiFi.macAddress().c_str());
@@ -67,14 +67,21 @@ void WiFiEvent(WiFiEvent_t event)
         Serial.print(F("  (RSSI: "));
         Serial.print(WiFi.RSSI());
         Serial.println(")");
+        if (getSensMode() == REAL_DATA)
+        {
+            ssd1306_publish("WiFi connected\n");
+            char s[51] = "";
+            sprintf(s, "SSID %s\n", WiFi.SSID().c_str());
+            ssd1306_publish(s);
+        }
         break;
     case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
         // digitalWrite(pinWiFiConnected, LOW);
         Serial.println(F("Disconnected from WiFi access point"));
-        if (digitalRead(SENS_MODE) == HIGH)
+        if (getSensMode() == REAL_DATA)
         {
             ssd1306_publish("WiFi disconnected\n");
-        }        
+        }
         break;
     case ARDUINO_EVENT_WIFI_STA_AUTHMODE_CHANGE:
         Serial.println(F("Authentication mode of access point has changed"));
@@ -82,7 +89,7 @@ void WiFiEvent(WiFiEvent_t event)
     case ARDUINO_EVENT_WIFI_STA_GOT_IP:
         Serial.print(F("Obtained IP address: "));
         Serial.println(WiFi.localIP());
-        if (digitalRead(SENS_MODE) == HIGH)
+        if (getSensMode() == REAL_DATA)
         {
             char s[21] = "";
             sprintf(s, "IP %s\n", WiFi.localIP().toString().c_str());

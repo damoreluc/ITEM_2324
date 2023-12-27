@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <APPLICATION\ADS1256\ADS1256.h>
 
-#define ADS1256QueueSize 100
+#define ADS1256QueueSize 4096
 
 // creation of queue for ADS1256 ADC data acquisition from ISR
 extern QueueHandle_t xQueueADS1256Sample;
