@@ -13,3 +13,7 @@
 
 // float max_magnitude = 0;
 // float fundamental_freq = 0;
+
+// windowing fumction
+//  see: https://www.recordingblogs.com/wiki/welch-window
+void welch(float w[], uint32_t len);

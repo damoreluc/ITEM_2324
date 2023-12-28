@@ -16,6 +16,9 @@ extern const float TOTAL_TIME;
 extern float max_magnitude;
 extern float fundamental_freq;
 
+// windowing table
+extern float window[FFT_SIZE];
+
 // ADC equalization table - see create_equalizer(m)
 extern float m[FFT_SIZE >> 1];
 

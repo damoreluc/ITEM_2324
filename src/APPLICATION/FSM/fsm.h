@@ -26,7 +26,12 @@ typedef enum
 // flag true quando i dati sono pronti
 extern volatile bool dataReady;
 
+// stato della MSF
 extern volatile tStati _stato;
+
+// some additional informations on task execution
+extern uint32_t freeHeap;
+extern uint32_t elapsedTime;
 
 // MSF di acquisizione
 void fsm();

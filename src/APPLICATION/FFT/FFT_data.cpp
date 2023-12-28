@@ -9,6 +9,9 @@ const double ONE_OVER_FFT_SIZE = 1.0 / ((double)FFT_SIZE);
 //The time in which data was captured. This is equal to FFT_SIZE/sampling_freq
 const float TOTAL_TIME=(float)FFT_SIZE/(float)FSAMPLE;
 
+// windowing table
+float window[FFT_SIZE];
+
 // ADC equalization table - see create_equalizer(m)
 float m[FFT_SIZE >> 1];
  

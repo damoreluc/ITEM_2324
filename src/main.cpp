@@ -233,7 +233,8 @@
 #include <APPLICATION/MCP6S26/pga.h>
 #include <APPLICATION/SSD1306/ssd1306.h>
 // #include <APPLICATION/FFT/FFT.h>
-// #include <APPLICATION/FFT/FFT_signal.h>
+#include <APPLICATION/FFT/FFT_signal.h>
+#include <APPLICATION/FFT/FFT_data.h>
 // #include <APPLICATION/FFT/fast_sqrt.h>
 #include <APPLICATION/SIM/sim_real_data_selector.h>
 #include <APPLICATION/FSM/fsm.h>
@@ -300,6 +301,9 @@ void setup()
     ssd1306_publish("Create EQ table\n");
     Serial.println(F("Create ADS1256 equalization table"));
     create_equalizer(m);
+    ssd1306_publish("Create window\n");
+    Serial.println(F("Create FFT window table"));
+    welch(window, FFT_SIZE);    
 
     // initialise vspi with default pins
     // SCLK = 18, MISO = 19, MOSI = 23, SS = 5

@@ -20,6 +20,10 @@ static uint32_t countADCTorque = 0; // conteggio accessi ADC sensori di coppia
 float adcValue;
 int kk;
 
+// some additional informations on task execution
+uint32_t freeHeap = 0;
+uint32_t elapsedTime = 0;
+
 tMode triggered = Stop;
 
 // flag true quando i dati sono pronti
@@ -138,7 +142,7 @@ void fsm()
                 }
                 else
                 {
-                    detachInterrupt(nDRDY);
+                    // detachInterrupt(nDRDY);
                     //  ferma il campionamento al completamento del numero di campioni
                     adc.standby();
 
@@ -150,7 +154,7 @@ void fsm()
                     {
                         xQueueReceive(xQueueADS1256Sample, (void *)&sampleFromISR, 0);
                         // real_fft_plan->input[i] = (sampleFromISR % 75) * 5.0 / FFT_SIZE;
-                        real_fft_plan->input[i] = adc.volt(sampleFromISR);
+                        real_fft_plan->input[i] = (adc.volt(sampleFromISR)-2.5) * window[i];
                         // Serial.print("Sample n. ");
                         // Serial.print(i);
                         // Serial.print("  Value: ");
@@ -235,7 +239,7 @@ void fsm()
         // wake-up the publish task
         xTaskNotifyGive(publishTaskHandle);
 
-        Serial.printf("Free heap: %d bytes \t", ESP.getFreeHeap());
+        freeHeap = ESP.getFreeHeap();
 
         // passa al prossimo canale
         MCP6S26_current_channel_index++;
@@ -245,6 +249,10 @@ void fsm()
         break;
 
     case WaitTrigger:
+
+        // print some task info
+ //       Serial.printf("Free heap: %d bytes \t", freeHeap);
+ //       Serial.printf("Elapsed time: %d ms", elapsedTime);
 
         // stay here until next Trigger command received by onMqttMessage
         if (mqttClient.connected() && (triggered == OneShot))

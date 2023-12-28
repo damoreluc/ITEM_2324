@@ -6,6 +6,7 @@
 #include <APPLICATION\MCP3204\mcp3204_data.h>
 #include <MQTT\mqtt_functions.h>
 #include <MQTT\custom\mqtt_topics.h>
+#include <APPLICATION\FSM\fsm.h>
 
 // handle del task di pubblicazione FFT
 TaskHandle_t publishTaskHandle;
@@ -90,10 +91,7 @@ void publishFFT(void *pvParameters)
         }
 
         uint32_t now = millis();
-
-        Serial.print("Elapsed time: ");
-        Serial.print(now - begin);
-        Serial.println(" ms");
+        elapsedTime = now - begin;
 
         // pubblicazione degli eventuali dati delle RTD
         if (xQueueRTD != NULL)
