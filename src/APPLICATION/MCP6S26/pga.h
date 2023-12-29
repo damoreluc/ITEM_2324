@@ -8,6 +8,7 @@ typedef struct
 {
   uint8_t channel;
   uint8_t gain;
+  uint8_t gainValue;
   bool gain_changed;
 } stPGA;
 

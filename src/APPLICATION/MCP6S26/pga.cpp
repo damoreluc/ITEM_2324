@@ -1,8 +1,11 @@
 #include <APPLICATION\MCP6S26\pga.h>
 #include <APPLICATION\MCP6S26\MCP6S26.h>
 
+// tabella guadagni del PGA MCP6S26
+uint8_t gainValues[] = {1, 2, 4, 5, 8, 10, 16, 32};
+
 // impostazioni del PGA0
-stPGA pga0 = {.channel = MCP6S26_CH1, .gain = MCP6S26_GAIN_1, .gain_changed = true};
+stPGA pga0 = {.channel = MCP6S26_CH1, .gain = MCP6S26_GAIN_1, .gainValue=gainValues[MCP6S26_GAIN_1] , .gain_changed = true};
 
 // comando del guadagno del PGA
 // è arrivato un messaggio da pgaSetGainTopic
@@ -40,9 +43,9 @@ void setPGAgain(char *data)
     if (g != pga0.gain)
     {
         pga0.gain = g;
+        pga0.gainValue = gainValues[g];
         pga0.gain_changed = true;
     }
     
-    Serial.print("\nSelettore guadagno = ");
-    Serial.println(pga0.gain);
+    Serial.printf("\nSelettore guadagno = %d\tGuadagno = %d\n", pga0.gain, pga0.gainValue);
 }

@@ -174,7 +174,7 @@ void fsm()
                     countData = 0;
 
                     // reset the xQueueADS1256Sample queue
-                    xQueueReset(xQueueADS1256Sample);
+                    //xQueueReset(xQueueADS1256Sample);
 
                     // segnala la fine del campionamento alla loop()
                     dataReady = true;
