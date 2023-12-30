@@ -5,5 +5,5 @@
 // Viene richiamata nella configMqttClient()
 void topicsToPublish() {
   // build the publishing topics dictionary
-  compilePubTopics(publishedTopics);    
+  //compilePubTopics(publishedTopics);    
 }

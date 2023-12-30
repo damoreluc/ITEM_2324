@@ -18,7 +18,7 @@ void IRAM_ATTR ISR_DRDY()
     adcValue = adc.ReadRawData();
 
     // push new data into ADS1256 queue
-    //xQueueSendFromISR(xQueueADS1256Sample, (void *)&countData, &xHigherPriorityTaskWoken);
+    // xQueueSendFromISR(xQueueADS1256Sample, (void *)&countData, &xHigherPriorityTaskWoken);
     xQueueSendFromISR(xQueueADS1256Sample, (void *)&adcValue, &xHigherPriorityTaskWoken);
     countData++;
 
@@ -28,7 +28,9 @@ void IRAM_ATTR ISR_DRDY()
       /* Actual macro used here is port specific. */
       portYIELD_FROM_ISR();
     }
-  } else {
+  }
+  else
+  {
     detachInterrupt(nDRDY);
     countData = 0;
   }

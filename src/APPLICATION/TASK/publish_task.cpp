@@ -79,11 +79,11 @@ void publishFFT(void *pvParameters)
           {
             if (MCP6S26_publish_channel_index == 0)
             {
-              res = mqttClient.publish(publishedTopics.get("outTopic0").c_str(), 0, false, (const char *)&(real_fft_plan->output[BLOCK_FLOAT_HALF_SIZE * j]), MQTT_MAX_SIZE_BYTE);
+              res = mqttClient.publish(pubTopics[outTopic0], 0, false, (const char *)&(real_fft_plan->output[BLOCK_FLOAT_HALF_SIZE * j]), MQTT_MAX_SIZE_BYTE);
             }
             else if (MCP6S26_publish_channel_index == 1)
             {
-              res = mqttClient.publish(publishedTopics.get("outTopic1").c_str(), 0, false, (const char *)&(real_fft_plan->output[BLOCK_FLOAT_HALF_SIZE * j]), MQTT_MAX_SIZE_BYTE);
+              res = mqttClient.publish(pubTopics[outTopic1], 0, false, (const char *)&(real_fft_plan->output[BLOCK_FLOAT_HALF_SIZE * j]), MQTT_MAX_SIZE_BYTE);
             }
 
             delay(25);
@@ -107,13 +107,13 @@ void publishFFT(void *pvParameters)
             sprintf(s, "%.3f", temp.rtd1);
             do
             {
-              res = mqttClient.publish(publishedTopics.get("outTopic2").c_str(), 0, false, (const char *)&s[0], strlen(s));
+              res = mqttClient.publish(pubTopics[outTopic2], 0, false, (const char *)&s[0], strlen(s));
               delay(10);
             } while (res == 0);
             // pubblicazione stato RTD1
             do
             {
-              res = mqttClient.publish(publishedTopics.get("outTopic3").c_str(), 0, false, (const char *)&temp.fault1[0], strlen(&temp.fault1[0])); // MSG_FAULT_LEN);
+              res = mqttClient.publish(pubTopics[outTopic3], 0, false, (const char *)&temp.fault1[0], strlen(&temp.fault1[0])); // MSG_FAULT_LEN);
               delay(10);
             } while (res == 0);
 
@@ -121,13 +121,13 @@ void publishFFT(void *pvParameters)
             sprintf(s, "%.3f", temp.rtd2);
             do
             {
-              res = mqttClient.publish(publishedTopics.get("outTopic4").c_str(), 0, false, (const char *)&s[0], strlen(s));
+              res = mqttClient.publish(pubTopics[outTopic4], 0, false, (const char *)&s[0], strlen(s));
               delay(10);
             } while (res == 0);
             // pubblicazione stato RTD2
             do
             {
-              res = mqttClient.publish(publishedTopics.get("outTopic5").c_str(), 0, false, (const char *)&temp.fault2[0], strlen(&temp.fault2[0])); // MSG_FAULT_LEN);
+              res = mqttClient.publish(pubTopics[outTopic5], 0, false, (const char *)&temp.fault2[0], strlen(&temp.fault2[0])); // MSG_FAULT_LEN);
               delay(10);
             } while (res == 0);
           }
@@ -145,7 +145,7 @@ void publishFFT(void *pvParameters)
             sprintf(s, "%9d", nadc);
             do
             {
-              res = mqttClient.publish(publishedTopics.get("outTopic6").c_str(), 0, false, (const char *)&s[0], strlen(s));
+              res = mqttClient.publish(pubTopics[outTopic6], 0, false, (const char *)&s[0], strlen(s));
               delay(10);
             } while (res == 0);
           }
@@ -154,7 +154,7 @@ void publishFFT(void *pvParameters)
         // pubblicazione dati mcp3204 mcp3204buffer[MCP3204_BUFFER_SIZE]
         do
         {
-          res = mqttClient.publish(publishedTopics.get("outTopic7").c_str(), 0, false, (const char *)&mcp3204buffer[0], MCP3204_BUFFER_SIZE * sizeof(float));
+          res = mqttClient.publish(pubTopics[outTopic7], 0, false, (const char *)&mcp3204buffer[0], MCP3204_BUFFER_SIZE * sizeof(float));
           delay(10);
         } while (res == 0);
       }

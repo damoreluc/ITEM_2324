@@ -4,6 +4,6 @@
 #include <dependencies/Dictionary/Dictionary.h>
 #include <Arduino.h>
 // print some boot messages on serial monitor
-void bootMsg(const char *mqttServer, Dictionary<String, String> &subTopics, Dictionary<String, String> &pubTopics);
+void bootMsg(const char *mqttServer, char subTopics[][50], char pubTopics[][50]);
 
 #endif

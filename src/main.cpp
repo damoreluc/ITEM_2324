@@ -1,7 +1,7 @@
 /*
-  valutare finestratura dei campioni dellìADS1256
-  con una finestra di Welch lunga FFT_SIZE punti:
-  link: https://www.recordingblogs.com/wiki/welch-window
+  Sostituiti i dizionari dei topics (published e subscribed)
+  con array statici di char
+  per valutare la causa dei kernel panic random 
 */
 
 /*
@@ -283,7 +283,7 @@ void setup()
   readSensMode();
 
   Serial.begin(115200);
-  bootMsg(mqttServer, subscribedTopics, publishedTopics);
+  bootMsg(mqttServer, subTopics, pubTopics);
 
   // creation of queue for ADS1256 ADC data acquisition from ISR
   xQueueADS1256Sample = xQueueCreate(ADS1256QueueSize, sizeof(int32_t));
@@ -355,7 +355,7 @@ void setup()
       NULL,               // parameter passed into the task
       10,                 // task priority
       &processTaskHandle, // the task's handle
-      1                   // pinned to core 1
+      APP_CPU_NUM         // pinned to core 1
   );
 
   if (xReturned != pdPASS)
@@ -379,7 +379,7 @@ void setup()
       NULL,               // parameter passed into the task
       1,                  // task priority
       &publishTaskHandle, // the task's handle
-      0                   // pinned to core 0
+      APP_CPU_NUM         // pinned to core 0 (PRO_CPU_NUM)
   );
 
   if (xReturned != pdPASS)
@@ -401,9 +401,9 @@ void setup()
       "sampleMCP3204",          // name for the task
       2048,                     // task size
       NULL,                     // parameter passed into the task
-      2,                        // task priority
+      11,                        // task priority
       &sampleMCP3204TaskHandle, // the task's handle
-      0                         // pinned to core 0
+      APP_CPU_NUM               // pinned to core 0
   );
 
   if (xReturned != pdPASS)
@@ -442,6 +442,9 @@ void setup()
 
   // Unlock the processing task, the output array is free
   xTaskNotifyGive(processTaskHandle);
+
+  // remove the setup() and loop() task
+  vTaskDelete(NULL);
 }
 
 void loop()

@@ -25,7 +25,7 @@ void parseMessage(char *topic, char *payload, AsyncMqttClientMessageProperties p
     // MSF Acquisition Command
     // A message arrived from triggerTopic
     // ( 0 = Stop, 1 = OneShot, 2 = FreeRun )
-    if (strcmp(topic, subscribedTopics.get("triggerTopic").c_str()) == 0)
+    if (strcmp(topic, subTopics[triggerTopic]) == 0)
     {
         // commands the MSF of data acquisition management
         triggerFSM(data);
@@ -34,7 +34,7 @@ void parseMessage(char *topic, char *payload, AsyncMqttClientMessageProperties p
     // PGA Gain Control
     // A message arrived from pgaSetGainTopic
     // it must be a value between 0 and 7; forced to 0 if out of range or non-numeric value
-    else if (strcmp(topic, subscribedTopics.get("pgaSetGainTopic").c_str()) == 0) 
+    else if (strcmp(topic, subTopics[pgaSetGainTopic]) == 0) 
     {
         // modifies the gain of the PGA MCP6S26
         setPGAgain(data);
