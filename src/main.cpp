@@ -289,10 +289,10 @@ void setup()
   xQueueADS1256Sample = xQueueCreate(ADS1256QueueSize, sizeof(int32_t));
 
   // creation of queue for MCP3204 ADC data publication
-  xQueueCountADCTorque = xQueueCreate(2, sizeof(uint32_t));
+  xQueueCountADCTorque = xQueueCreate(3, sizeof(uint32_t));
 
   // creation of queue for RTD temperature publication
-  xQueueRTD = xQueueCreate(5, sizeof(stRTD));
+  xQueueRTD = xQueueCreate(6, sizeof(stRTD));
 
   if (getSensMode() == REAL_DATA)
   {
@@ -353,9 +353,9 @@ void setup()
       "process",          // name for the task
       4096,               // task size
       NULL,               // parameter passed into the task
-      10,                 // task priority
+      4,                  // task priority
       &processTaskHandle, // the task's handle
-      APP_CPU_NUM         // pinned to core 1
+      APP_CPU_NUM         // pinned to core 0/1
   );
 
   if (xReturned != pdPASS)
@@ -377,9 +377,9 @@ void setup()
       "publishFFT",       // name for the task
       4096,               // task size
       NULL,               // parameter passed into the task
-      1,                  // task priority
+      6,                  // task priority
       &publishTaskHandle, // the task's handle
-      APP_CPU_NUM         // pinned to core 0 (PRO_CPU_NUM)
+      PRO_CPU_NUM         // pinned to core 0/1 (PRO_CPU_NUM)
   );
 
   if (xReturned != pdPASS)
@@ -401,9 +401,9 @@ void setup()
       "sampleMCP3204",          // name for the task
       2048,                     // task size
       NULL,                     // parameter passed into the task
-      11,                        // task priority
+      5,                        // task priority
       &sampleMCP3204TaskHandle, // the task's handle
-      APP_CPU_NUM               // pinned to core 0
+      APP_CPU_NUM               // pinned to core 1
   );
 
   if (xReturned != pdPASS)

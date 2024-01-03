@@ -21,11 +21,11 @@ void sampleMCP3204(void *pvParameters)
 
       /*
        * debug
-       
-      mcp3204_dati.volt0 = 2.5;
-      mcp3204_dati.volt1 = 3.0;
-      mcp3204_dati.volt2 = 1.5;
-      mcp3204_dati.volt3 = 2.0;
+      
+      mcp3204_dati.volt0 = 0.5;
+      mcp3204_dati.volt1 = 1.5;
+      mcp3204_dati.volt2 = 2.0;
+      mcp3204_dati.volt3 = 2.5;
       
        * fine debug
        */

@@ -44,5 +44,7 @@ void  ADS1256Ext::setGain(pgaGains gain) {
 ADS1256Ext adc;
 
 // ADS1256 DRDY
-volatile bool newData = false;
+// synchronisation between ISR and FSM
+volatile bool newData = false;  // No more necessary, used a queue instead 
+// new sample index, queued from ISR into the xQueueADS1256Sample queue
 volatile int32_t countData = 0;
