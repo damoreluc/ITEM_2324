@@ -23,6 +23,7 @@ int kk;
 // some additional informations on task execution
 uint32_t freeHeap = 0;
 uint32_t elapsedTime = 0;
+uint32_t QueueLength, maxQueueLength = 0;
 
 tMode triggered = Stop;
 
@@ -43,16 +44,16 @@ void DebugCurrentStatus(tStati st)
     }
 }
 
-// MSF del task di acquisizione e trasformazione dei dati -----------------------------------------
+// FSM of the Data Capture and Transformation Task ------------------------------------------------
 void fsm()
 {
     switch (_stato)
     {
     case StartADC:
-        // reset conteggio ADC torque
+        // ADC Torque Count Reset
         countADCTorque = 0;
         dataReady = false;
-        // imposta il canale corrente dell'ADC
+        // sets the current channel of the ADC
         // Serial.printf("Channel: %d\n", MCP6S26_current_channel_index);
 
         // inizializzazione fft
@@ -72,15 +73,15 @@ void fsm()
         if (getSensMode() == REAL_DATA)
         {
             // set isr pointer at the beginning of real_fft_plan->input[] array:
-           // pSampleISR = &real_fft_plan->input[0];
+            // pSampleISR = &real_fft_plan->input[0];
 
-            // modalità SPI per transazioni con MCP3204 e MCP6S26
+            // SPI mode for MCP3204 and MCP6S26 transactions
             vspi.beginTransaction(SPISettings(MCP3204_SPI_CLOCK, MSBFIRST, SPI_MODE0));
 
-            //  uso il MUX del pga MCP6S26 per il multiplexing dei due ingressi accelerometrici verso ADS1256
-             pga0.channel = pga0_channels[MCP6S26_current_channel_index];
-             mcp6s26_setChannel(vspi, CS_PGA0, pga0.channel);
-            // eventuale aggiornamento del guadagno del pga MCP6S26
+            // I use the MUX of the pga MCP6S26 to multiplexe the two accelerometer inputs to ADS1256
+            pga0.channel = pga0_channels[MCP6S26_current_channel_index];
+            mcp6s26_setChannel(vspi, CS_PGA0, pga0.channel);
+            // Possible update of the PGA gain MCP6S26
             if (pga0.gain_changed)
             {
                 pga0.gain_changed = false;
@@ -91,24 +92,27 @@ void fsm()
                 delay(5);
             }
 
-            // avvio dell'ADC ADS1256 per acquisizione accelerometri
+            // Starting the ADC ADS1256 for Accelerometer Acquisition
             adc.wakeup();
-            // associa l'interrupt esterno di nDRDY alla sua ISR
+            // binds nDRDY's external interrupt to its ISR
             attachInterrupt(nDRDY, ISR_DRDY, FALLING);
         }
 
-        // prossimo stato
+        // Move to the next status
         _stato = Sampling;
+        // reset counter samples captured from the xQueueADS1256Sample queue
+        sampleCounter = 0;
 
         break;
 
     case Sampling:
-        // acquisizione di un canale accelerometrico dall'ADC ADS1256
+        // Acquiring Accelerometer samples from the ADS1256 ADC
+        // provare usare taskNotify per sincronizzare l'acquisizione tra la ISR e la FSM nello stato Sampling
         if (getSensMode() == REAL_DATA)
         {
             int32_t sampleFromISR;
             // while ((xQueueReceive(xQueueADS1256Sample, (void *)&sampleFromISR, 0) == pdTRUE) && (sampleCounter < FFT_SIZE))
-            if (newData) // settato dalla ISR su DRDY dell'ADS1256
+            //if (newData) // settato dalla ISR su DRDY dell'ADS1256
             {
                 // sampleFromISR = real_fft_plan->input[sampleCounter];
 
@@ -120,78 +124,71 @@ void fsm()
                 newData = false;
 
                 // if (sampleCounter < FFT_SIZE)
-                if (uxQueueSpacesAvailable(xQueueADS1256Sample) > 0)
+                if (sampleCounter < FFT_SIZE)
                 {
-                    // get ADS1256 new sample
-                    // adcValue = (float)adc.ReadRawData();
-                    // real_fft_plan->input[sampleCounter] = adc.volt(adcValue);
-                    ////real_fft_plan->input[sampleCounter] = (sampleFromISR % 75) * 5.0 / FFT_SIZE;
-                    sampleCounter++;
-                    numberOfAds1256Cycles++;
-
-                    // get MCP3204 new samples
-                    // if ((numberOfAds1256Cycles >= MCP3204_NUMBER_OF_ADS1256_CYCLES) && (mcp3204_BufferAvailable() > 0))
-                    if ((numberOfAds1256Cycles >= MCP3204_NUMBER_OF_ADS1256_CYCLES))
+                    QueueLength = uxQueueMessagesWaiting(xQueueADS1256Sample);
+                    // if (uxQueueSpacesAvailable(xQueueADS1256Sample) > 0)
+                    if (QueueLength > 0)
                     {
-                        numberOfAds1256Cycles = 0;
-                        countADCTorque++;
+                        // pop ADS1256 samples from queue
+                        adcValue = adc.ReadRawData();
+                        // real_fft_plan->input[sampleCounter] = adc.volt(adcValue);
 
-                        // wake-up the MCP3204 acquisition task
-                        xTaskNotifyGive(sampleMCP3204TaskHandle);
+                        xQueueReceive(xQueueADS1256Sample, (void *)&sampleFromISR, 5);
+
+                        // real_fft_plan->input[sampleCounter] = (sampleFromISR % 75) * 5.0 / FFT_SIZE;
+                        // real_fft_plan->input[sampleCounter] = (adc.volt(sampleFromISR) - 2.5) * window[sampleCounter];
+                        real_fft_plan->input[sampleCounter] = (adc.volt(adcValue) - 2.5) * window[sampleCounter];
+
+                        // update sample counter
+                        sampleCounter++;
+                        numberOfAds1256Cycles++;
+                        if (QueueLength > maxQueueLength)
+                        {
+                            maxQueueLength = QueueLength;
+                        }
+
+                        // get MCP3204 new samples
+                        // if ((numberOfAds1256Cycles >= MCP3204_NUMBER_OF_ADS1256_CYCLES) && (mcp3204_BufferAvailable() > 0))
+                        if ((numberOfAds1256Cycles >= MCP3204_NUMBER_OF_ADS1256_CYCLES))
+                        {
+                            numberOfAds1256Cycles = 0;
+                            countADCTorque++;
+
+                            // wake-up the MCP3204 acquisition task
+                            xTaskNotifyGive(sampleMCP3204TaskHandle);
+                        }
                     }
                 }
                 else
                 {
                     // detachInterrupt(nDRDY);
-                    //  ferma il campionamento al completamento del numero di campioni
+                    // Stop sampling when the number of samples is reached
                     adc.standby();
 
-                    // termina la transazione SPI conl'adc MCP3204
+                    // Terminate the SPI transaction with the MCP3204 ADC
                     vspi.endTransaction();
 
-                    // pop samples from queue
-                    for (uint16_t i = 0; i < FFT_SIZE; i++)
-                    {
-                        xQueueReceive(xQueueADS1256Sample, (void *)&sampleFromISR, 0);
-                        // real_fft_plan->input[i] = (sampleFromISR % 75) * 5.0 / FFT_SIZE;
-                        real_fft_plan->input[i] = (adc.volt(sampleFromISR)-2.5) * window[i];
-                        // Serial.print("Sample n. ");
-                        // Serial.print(i);
-                        // Serial.print("  Value: ");
-                        // Serial.println(sampleFromISR);
-                    }
-
-                    // // debug: campioni persi?
-                    // Serial.print("campioni memorizzati: ");
-                    // Serial.print(sampleCounter);
-                    // Serial.print("   campioni acquisiti: ");
-                    // Serial.print(countData - 1);
-                    // Serial.print("   differenza: ");
-                    // Serial.println(countData - 1 - sampleCounter);
-
-                    // resetta l'indice dell'array dei dati
+                    // Reset the Data Array Index
                     sampleCounter = 0;
                     countData = 0;
 
-                    // reset the xQueueADS1256Sample queue
-                    //xQueueReset(xQueueADS1256Sample);
-
-                    // segnala la fine del campionamento alla loop()
+                    // Signal end of sampling
                     dataReady = true;
                 }
             }
         }
 
-        // simulazione campionamento per FFT (durata 576ms)
+        // Sampling simulation for FFT (duration 576ms)
         else if (getSensMode() == SYM_DATA)
         {
-            // dati ADS1256 simulati per singolo canale
+            // Simulated ADS1256 data per channel
             for (kk = 0; kk < FFT_SIZE; kk++)
             {
                 real_fft_plan->input[kk] = 1.0 + 0.5 * MCP6S26_current_channel_index;
             }
 
-            // dati coppie e velocità simulati
+            // Simulated torque and speed data
             for (kk = 0; kk < MCP3204_NUMBER_OF_SAMPLES_PER_CHANNEL; kk++)
             {
                 mcp3204_dati.volt0 = 0.5;
@@ -201,12 +198,12 @@ void fsm()
                 mcp3204_Push(&mcp3204_dati);
             }
 
-            // durata del ciclo di acquisizione reale
+            // Actual Acquisition Cycle Length
             delay(546);
             dataReady = true;
         }
 
-        // termine dello stato di campionamento
+        // End of Sampling Status
         if (dataReady == true)
         {
             dataReady = false;
@@ -222,7 +219,6 @@ void fsm()
         fft_execute(real_fft_plan);
 
         // read RTD1 and store result into xQueueRTD1
-        //++ dati RTD simulati
         readRTD();
 
         // push count ADC into xQueueCountAdcTorque
@@ -241,18 +237,20 @@ void fsm()
 
         freeHeap = ESP.getFreeHeap();
 
-        // passa al prossimo canale
+        // Skip to the next channel
         MCP6S26_current_channel_index++;
 
-        // torna allo stato WaitTrigger
+        // back to WaitTrigger status
         _stato = WaitTrigger;
+
+        // print some task info
+        Serial.printf("Free heap: %d bytes \t", freeHeap);
+        Serial.printf("Max queue length: %d\n", maxQueueLength);
+        maxQueueLength = 0;
+        //       Serial.printf("Elapsed time: %d ms", elapsedTime);
         break;
 
     case WaitTrigger:
-
-        // print some task info
- //       Serial.printf("Free heap: %d bytes \t", freeHeap);
- //       Serial.printf("Elapsed time: %d ms", elapsedTime);
 
         // stay here until next Trigger command received by onMqttMessage
         if (mqttClient.connected() && (triggered == OneShot))
@@ -269,7 +267,7 @@ void fsm()
         }
         else if (mqttClient.connected() && (triggered == FreeRun))
         {
-            // passa al prossimo canale
+            // Skip to the next channel
             if (MCP6S26_current_channel_index >= CHANNELS_N)
             {
                 MCP6S26_current_channel_index = 0;
@@ -278,7 +276,7 @@ void fsm()
         }
         else if (mqttClient.connected() && (triggered == Stop))
         {
-            // termina la scansione
+            // End the Scan
             MCP6S26_current_channel_index = 0;
             _stato = WaitTrigger;
         }
