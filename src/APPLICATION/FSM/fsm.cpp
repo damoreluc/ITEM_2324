@@ -103,6 +103,8 @@ void fsm()
         _stato = Sampling;
         // reset counter samples captured from the xQueueADS1256Sample queue
         sampleCounter = 0;
+        // reset mean value accumulator
+        meanValue = 0.0;
 
         break;
 
