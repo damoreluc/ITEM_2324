@@ -18,6 +18,7 @@ static uint16_t sampleCounter = 0; // number of samples gathered
 static uint32_t numberOfAds1256Cycles = 0;
 static uint32_t countADCTorque = 0; // conteggio accessi ADC sensori di coppia
 float adcValue;
+float meanValue = 0.0;
 int kk;
 
 // some additional informations on task execution
@@ -111,19 +112,12 @@ void fsm()
         if (getSensMode() == REAL_DATA)
         {
             int32_t sampleFromISR;
-            // while ((xQueueReceive(xQueueADS1256Sample, (void *)&sampleFromISR, 0) == pdTRUE) && (sampleCounter < FFT_SIZE))
-            //if (newData) // settato dalla ISR su DRDY dell'ADS1256
-            {
-                // sampleFromISR = real_fft_plan->input[sampleCounter];
 
                 // Serial.print("Sample n. ");
                 // Serial.print(sampleCounter);
                 // Serial.print("  Value: ");
                 // Serial.println(sampleFromISR);
 
-                newData = false;
-
-                // if (sampleCounter < FFT_SIZE)
                 if (sampleCounter < FFT_SIZE)
                 {
                     QueueLength = uxQueueMessagesWaiting(xQueueADS1256Sample);
@@ -131,14 +125,14 @@ void fsm()
                     if (QueueLength > 0)
                     {
                         // pop ADS1256 samples from queue
-                        adcValue = adc.ReadRawData();
-                        // real_fft_plan->input[sampleCounter] = adc.volt(adcValue);
+                        adcValue = adc.volt(adc.ReadRawData());
+                        meanValue += adcValue;
 
                         xQueueReceive(xQueueADS1256Sample, (void *)&sampleFromISR, 5);
 
                         // real_fft_plan->input[sampleCounter] = (sampleFromISR % 75) * 5.0 / FFT_SIZE;
                         // real_fft_plan->input[sampleCounter] = (adc.volt(sampleFromISR) - 2.5) * window[sampleCounter];
-                        real_fft_plan->input[sampleCounter] = (adc.volt(adcValue) - 2.5) * window[sampleCounter];
+                        real_fft_plan->input[sampleCounter] = adcValue;
 
                         // update sample counter
                         sampleCounter++;
@@ -149,7 +143,6 @@ void fsm()
                         }
 
                         // get MCP3204 new samples
-                        // if ((numberOfAds1256Cycles >= MCP3204_NUMBER_OF_ADS1256_CYCLES) && (mcp3204_BufferAvailable() > 0))
                         if ((numberOfAds1256Cycles >= MCP3204_NUMBER_OF_ADS1256_CYCLES))
                         {
                             numberOfAds1256Cycles = 0;
@@ -176,7 +169,7 @@ void fsm()
                     // Signal end of sampling
                     dataReady = true;
                 }
-            }
+            
         }
 
         // Sampling simulation for FFT (duration 576ms)
@@ -215,6 +208,12 @@ void fsm()
     case Compute:
         // hang here until FFT output data are published
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        // remove mean value and apply windowing on time samples
+        meanValue /= FFT_SIZE;
+        for(uint16_t i = 0; i < FFT_SIZE; i++) {
+            real_fft_plan->input[i] = (real_fft_plan->input[i] - meanValue) * window[i];
+        }
+
         // Execute FFT transformation
         fft_execute(real_fft_plan);
 

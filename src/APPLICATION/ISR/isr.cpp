@@ -9,22 +9,16 @@
 void IRAM_ATTR ISR_DRDY()
 {
   BaseType_t xHigherPriorityTaskWoken;
-  //volatile int32_t adcValue;
 
   if (countData < FFT_SIZE)
   {
-
-    newData = true;
-
     // get new sample from ADS1256
     // the ReadRawData() method raises unpredictable glitches on RTOS execution
-    // that lead to system reboot. 
+    // that lead to system reboot.
     // work around: move the call into the fsm
-    //adcValue = adc.ReadRawData();
 
     // push new data into ADS1256 queue
     xQueueSendFromISR(xQueueADS1256Sample, (void *)&countData, &xHigherPriorityTaskWoken);
-    //xQueueSendFromISR(xQueueADS1256Sample, (void *)&adcValue, &xHigherPriorityTaskWoken);
     countData++;
 
     // Now we can switch context if necessary

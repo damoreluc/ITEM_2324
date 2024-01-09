@@ -23,7 +23,6 @@ class ADS1256Ext : public ADS1256 {
 extern ADS1256Ext adc;
 
 // ADS1256 DRDY
-extern volatile bool newData;
 extern volatile int32_t countData;
 
 #endif

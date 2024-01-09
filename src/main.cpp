@@ -251,30 +251,6 @@
 // #include <MQTT/broker/raspi4.h>
 // #include <MQTT/broker/mosquitto.h>
 
-// ADS1256 parameters ----------------------------------------------
-
-// canale SPI per connessione con ADC ADS1256
-// SPIClass hspi = SPIClass(HSPI);
-
-// // ADC equalization table - see create_equalizer(m)
-// float m[FFT_SIZE >> 1];
-
-// // ADS1256 DRDY
-// volatile bool newData = false;
-// volatile uint16_t countData = 0;
-
-// // ADC instance
-// ADS1256Ext adc;
-// // list of channels to sample
-// // byte channels[CHANNELS_N] = {adc.ads1256_mux[0], adc.ads1256_mux[1]};
-// byte channels[CHANNELS_N] = {adc.ads1256_mux[0], adc.ads1256_mux[0]}; // mux now is located into PGA0
-
-// using differential inputs:
-//  AIN0+ as signal+
-//  AIN1+ as ADC_Half_Vref
-// byte channels[CHANNELS_N] = {adc.ads1256_dmux[0], adc.ads1256_dmux[0]}; // using PGA0 also as AMUX
-
-
 
 // -----------------------------------------------------------------------
 void setup()
