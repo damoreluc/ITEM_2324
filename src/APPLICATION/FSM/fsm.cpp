@@ -221,7 +221,7 @@ void fsm()
         fft_execute(real_fft_plan);
 
         // update aux_in status
-        aux_din_status = digitalRead(AUX_DIN);
+        aux_din_status = !digitalRead(AUX_DIN);
 
         // read RTD1 and store result into xQueueRTD1
         readRTD();

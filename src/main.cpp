@@ -276,7 +276,7 @@ void setup()
     // configure AUX_DIN as digital input
     pinMode(AUX_DIN, INPUT_PULLUP);
     // read 1-st input status
-    aux_din_status = digitalRead(AUX_DIN);
+    aux_din_status = !digitalRead(AUX_DIN);
 
     // create ADS1256 equalization table
     ssd1306_log_setup();
