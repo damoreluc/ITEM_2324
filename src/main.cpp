@@ -241,6 +241,7 @@
 #include <APPLICATION/TASK/task.h>
 #include <APPLICATION/ISR/isr.h>
 #include <APPLICATION/boot.h>
+#include <APPLICATION/AUXDIN/aux_din.h>
 
 // uncomment this #define to print fft components
 // #define PRINT_COMPONENTS
@@ -272,6 +273,11 @@ void setup()
 
   if (getSensMode() == REAL_DATA)
   {
+    // configure AUX_DIN as digital input
+    pinMode(AUX_DIN, INPUT_PULLUP);
+    // read 1-st input status
+    aux_din_status = digitalRead(AUX_DIN);
+
     // create ADS1256 equalization table
     ssd1306_log_setup();
     ssd1306_publish("Create EQ table\n");

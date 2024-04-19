@@ -7,6 +7,7 @@
 #include <MQTT\mqtt_functions.h>
 #include <MQTT\custom\mqtt_topics.h>
 #include <APPLICATION\FSM\fsm.h>
+#include <APPLICATION/AUXDIN/aux_din.h>
 
 // handle del task di pubblicazione FFT
 TaskHandle_t publishTaskHandle;
@@ -157,8 +158,17 @@ void publishFFT(void *pvParameters)
           res = mqttClient.publish(publishedTopics.get("outTopic7").c_str(), 0, false, (const char *)&mcp3204buffer[0], MCP3204_BUFFER_SIZE * sizeof(float));
           delay(10);
         } while (res == 0);
-      }
 
+        // pubblica lo stato dell'ingresso ausiliario aux_din
+        if (aux_din_status)
+        {
+          res = mqttClient.publish(publishedTopics.get("auxdinTopic").c_str(), 0, false, "true");
+        }
+        else
+        {
+          res = mqttClient.publish(publishedTopics.get("auxdinTopic").c_str(), 0, false, "false");
+        }
+      }
       // sblocca il task di elaborazione, l'array output è libero
       xTaskNotifyGive(processTaskHandle);
     }

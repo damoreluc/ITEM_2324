@@ -36,4 +36,6 @@ void compilePubTopics(Dictionary<String, String> &pubTopics) {
   pubTopics.set("outTopic7", thisClient "/TorqueSpeedTopic");
   // topic di pubblicazione valore attuale del guadagno PGA
   pubTopics.set("pgaGetGainTopic", thisClient "/pgaGetGain");
+  // topic di pubblicazione valore attuale del pin AUX_DIN
+  pubTopics.set("auxdinTopic", thisClient "/auxdin");  
   }

@@ -11,6 +11,7 @@
 #include <APPLICATION\MCP6S26\MCP6S26.h>
 #include <APPLICATION\MCP6S26\pga.h>
 #include <APPLICATION\ISR\isr.h>
+#include <APPLICATION/AUXDIN/aux_din.h>
 
 static uint64_t last = millis();
 static uint64_t lastFFT;
@@ -218,6 +219,9 @@ void fsm()
 
         // Execute FFT transformation
         fft_execute(real_fft_plan);
+
+        // update aux_in status
+        aux_din_status = digitalRead(AUX_DIN);
 
         // read RTD1 and store result into xQueueRTD1
         readRTD();
