@@ -14,6 +14,11 @@ fft_config_t *fft_init(int size, fft_type_t type, fft_direction_t direction, flo
   int k, m;
 
   fft_config_t *config = (fft_config_t *)malloc(sizeof(fft_config_t));
+  // Check if malloc succeeded
+  if (config == NULL) {
+    free(config);
+    return NULL;
+  }
 
   // Check if the size is a power of two
   if ((size & (size - 1)) != 0) // tests if size is a power of two
@@ -27,6 +32,12 @@ fft_config_t *fft_init(int size, fft_type_t type, fft_direction_t direction, flo
 
   // Allocate and precompute twiddle factors
   config->twiddle_factors = (float *)malloc(2 * config->size * sizeof(float));
+  
+  // ✅ FIX #5: Check if malloc succeeded
+  if (config->twiddle_factors == NULL) {
+    free(config);
+    return NULL;
+  }
 
   float two_pi_by_n = TWO_PI / config->size;
 
@@ -92,16 +103,27 @@ fft_config_t *fft_init_pre(int size, fft_type_t type, fft_direction_t direction,
    * If no input or output buffers are provided, they will be allocated.
    */
   fft_config_t *config = (fft_config_t *)malloc(sizeof(fft_config_t));
+  
+  // ✅ FIX #7a: Check if malloc succeeded
+  if (config == NULL) {
+    return NULL;
+  }
 
   // Check if the size is a power of two
   if ((size & (size - 1)) != 0) // tests if size is a power of two
+  {
+    free(config);
     return NULL;
+  }
 
   // start configuration
   config->flags = 0;
   config->type = type;
   config->direction = direction;
   config->size = size;
+  
+  // ✅ FIX #7b: Initialize twiddle_factors to NULL before checking
+  config->twiddle_factors = NULL;
 
   // Allocate and precompute twiddle factors
   // if (twiddle != NULL)
@@ -110,6 +132,12 @@ fft_config_t *fft_init_pre(int size, fft_type_t type, fft_direction_t direction,
   if (config->twiddle_factors == NULL)
   {
     config->twiddle_factors = (float *)malloc(2 * config->size * sizeof(float));
+    
+    // ✅ FIX #5: Check if malloc succeeded
+    if (config->twiddle_factors == NULL) {
+      free(config);
+      return NULL;
+    }
 
     computeTwiddle(config->twiddle_factors, config->size);
 

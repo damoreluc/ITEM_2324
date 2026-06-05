@@ -2,14 +2,20 @@
 #include <APPLICATION\ADS1256\ADS1256Ext.h>
 #include <APPLICATION\HWCONFIG\hwConfig.h>
 
+// ✅ FIX #6: Spinlock for countData synchronization
+portMUX_TYPE countDataMux = portMUX_INITIALIZER_UNLOCKED;
+
 // ISR for the management of the arrival of a new sample on the DRDY falling edge
 // uses the xQueueADS1256Sample queue to tell the fsm the index of the sample to be scanned
 
 // provare ad usare taskNotify per sincronizzare l'acquisizione tra questa ISR e la FSM nello stato Sampling
 void IRAM_ATTR ISR_DRDY()
 {
-  BaseType_t xHigherPriorityTaskWoken;
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
+  // ✅ FIX #6: Protect countData access with spinlock
+  portENTER_CRITICAL_ISR(&countDataMux);
+  
   if (countData < FFT_SIZE)
   {
     // get new sample from ADS1256
@@ -33,4 +39,6 @@ void IRAM_ATTR ISR_DRDY()
     detachInterrupt(nDRDY);
     countData = 0;
   }
+  
+  portEXIT_CRITICAL_ISR(&countDataMux);
 }

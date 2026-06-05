@@ -64,6 +64,15 @@ void fsm()
             Serial.println(F("Inizializzazione FFT"));
             // real_fft_plan = fft_init(FFT_SIZE, FFT_REAL, FFT_FORWARD, f_input, f_output);
             real_fft_plan = fft_init(FFT_SIZE, FFT_REAL, FFT_FORWARD, NULL, NULL);
+            
+            // ✅ FIX #7: Check if FFT initialization failed
+            if (real_fft_plan == NULL)
+            {
+                Serial.println(F("ERROR: FFT init failed - insufficient memory"));
+                _stato = WaitTrigger;  // Reset to wait state
+                break;  // Exit FSM without continuing
+            }
+            
             pInput = real_fft_plan->input;
         }
 
@@ -167,7 +176,10 @@ void fsm()
 
                     // Reset the Data Array Index
                     sampleCounter = 0;
+                    // ✅ FIX #6: Protect countData reset with spinlock
+                    portENTER_CRITICAL(&countDataMux);
                     countData = 0;
+                    portEXIT_CRITICAL(&countDataMux);
 
                     // Signal end of sampling
                     dataReady = true;

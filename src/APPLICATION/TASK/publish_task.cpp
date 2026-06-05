@@ -73,9 +73,11 @@ void publishFFT(void *pvParameters)
         uint16_t j;
         uint16_t res = 0;
         uint32_t begin = millis();
+        const uint32_t MQTT_PUBLISH_TIMEOUT_MS = 5000;  // ✅ FIX #4: 5 second timeout
 
         for (j = 0; j < BLOCKS_FLOAT; j++)
         {
+          uint32_t mqtt_timeout = millis();
           do
           {
             if (MCP6S26_publish_channel_index == 0)
@@ -88,7 +90,7 @@ void publishFFT(void *pvParameters)
             }
 
             delay(25);
-          } while (res == 0);
+          } while (res == 0 && (millis() - mqtt_timeout) < MQTT_PUBLISH_TIMEOUT_MS);
         }
 
         uint32_t now = millis();
@@ -106,31 +108,43 @@ void publishFFT(void *pvParameters)
 
             // pubblicazione valore RTD1
             sprintf(s, "%.3f", temp.rtd1);
-            do
             {
-              res = mqttClient.publish(publishedTopics.get("outTopic2").c_str(), 0, false, (const char *)&s[0], strlen(s));
-              delay(10);
-            } while (res == 0);
+              uint32_t mqtt_timeout = millis();
+              do
+              {
+                res = mqttClient.publish(publishedTopics.get("outTopic2").c_str(), 0, false, (const char *)&s[0], strlen(s));
+                delay(10);
+              } while (res == 0 && (millis() - mqtt_timeout) < MQTT_PUBLISH_TIMEOUT_MS);
+            }
             // pubblicazione stato RTD1
-            do
             {
-              res = mqttClient.publish(publishedTopics.get("outTopic3").c_str(), 0, false, (const char *)&temp.fault1[0], strlen(&temp.fault1[0])); // MSG_FAULT_LEN);
-              delay(10);
-            } while (res == 0);
+              uint32_t mqtt_timeout = millis();
+              do
+              {
+                res = mqttClient.publish(publishedTopics.get("outTopic3").c_str(), 0, false, (const char *)&temp.fault1[0], strlen(&temp.fault1[0])); // MSG_FAULT_LEN);
+                delay(10);
+              } while (res == 0 && (millis() - mqtt_timeout) < MQTT_PUBLISH_TIMEOUT_MS);
+            }
 
             // pubblicazione valore RTD2
             sprintf(s, "%.3f", temp.rtd2);
-            do
             {
-              res = mqttClient.publish(publishedTopics.get("outTopic4").c_str(), 0, false, (const char *)&s[0], strlen(s));
-              delay(10);
-            } while (res == 0);
+              uint32_t mqtt_timeout = millis();
+              do
+              {
+                res = mqttClient.publish(publishedTopics.get("outTopic4").c_str(), 0, false, (const char *)&s[0], strlen(s));
+                delay(10);
+              } while (res == 0 && (millis() - mqtt_timeout) < MQTT_PUBLISH_TIMEOUT_MS);
+            }
             // pubblicazione stato RTD2
-            do
             {
-              res = mqttClient.publish(publishedTopics.get("outTopic5").c_str(), 0, false, (const char *)&temp.fault2[0], strlen(&temp.fault2[0])); // MSG_FAULT_LEN);
-              delay(10);
-            } while (res == 0);
+              uint32_t mqtt_timeout = millis();
+              do
+              {
+                res = mqttClient.publish(publishedTopics.get("outTopic5").c_str(), 0, false, (const char *)&temp.fault2[0], strlen(&temp.fault2[0])); // MSG_FAULT_LEN);
+                delay(10);
+              } while (res == 0 && (millis() - mqtt_timeout) < MQTT_PUBLISH_TIMEOUT_MS);
+            }
           }
         }
 
@@ -144,20 +158,26 @@ void publishFFT(void *pvParameters)
           {
             xQueueReceive(xQueueCountADCTorque, &nadc, portMAX_DELAY);
             sprintf(s, "%9d", nadc);
-            do
             {
-              res = mqttClient.publish(publishedTopics.get("outTopic6").c_str(), 0, false, (const char *)&s[0], strlen(s));
-              delay(10);
-            } while (res == 0);
+              uint32_t mqtt_timeout = millis();
+              do
+              {
+                res = mqttClient.publish(publishedTopics.get("outTopic6").c_str(), 0, false, (const char *)&s[0], strlen(s));
+                delay(10);
+              } while (res == 0 && (millis() - mqtt_timeout) < MQTT_PUBLISH_TIMEOUT_MS);
+            }
           }
         }
 
         // pubblicazione dati mcp3204 mcp3204buffer[MCP3204_BUFFER_SIZE]
-        do
         {
-          res = mqttClient.publish(publishedTopics.get("outTopic7").c_str(), 0, false, (const char *)&mcp3204buffer[0], MCP3204_BUFFER_SIZE * sizeof(float));
-          delay(10);
-        } while (res == 0);
+          uint32_t mqtt_timeout = millis();
+          do
+          {
+            res = mqttClient.publish(publishedTopics.get("outTopic7").c_str(), 0, false, (const char *)&mcp3204buffer[0], MCP3204_BUFFER_SIZE * sizeof(float));
+            delay(10);
+          } while (res == 0 && (millis() - mqtt_timeout) < MQTT_PUBLISH_TIMEOUT_MS);
+        }
 
         // pubblica lo stato dell'ingresso ausiliario aux_din
         if (aux_din_status)
