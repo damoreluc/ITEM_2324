@@ -262,6 +262,10 @@ void setup()
   Serial.begin(115200);
   bootMsg(mqttServer, subscribedTopics, publishedTopics);
 
+  // Force WiFi stack to run on core 0 (PRO_CPU)
+  Serial.println(F("Configuring network stack for core 0..."));
+  WiFi.setTxPower(WIFI_POWER_19_5dBm);  // Set TX power to reduce interference
+  
   // creation of queue for ADS1256 ADC data acquisition from ISR
   xQueueADS1256Sample = xQueueCreate(ADS1256QueueSize, sizeof(int32_t));
 

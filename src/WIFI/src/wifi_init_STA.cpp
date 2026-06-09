@@ -6,7 +6,11 @@ void initWiFi_STA()
   // comanda un led per indicare la connessione all'access point WiFi
   // pinMode(pinWiFiConnected, OUTPUT);
 
+  // WiFi is configured to run on core 0 (PRO_CPU) via platformio.ini build flags:
+  // CONFIG_LWIP_CORE=0, CONFIG_ESP_WIFI_TASK_CORE_ID=0, CONFIG_ESP_WIFI_TASK_AFFINITY=0x1
   WiFi.mode(WIFI_STA);
+  
+  Serial.println(F("WiFi configured for core 0 operation"));
 
   // gestione degli eventi WiFi
   WiFi.onEvent(WiFiEvent, WiFiEvent_t::ARDUINO_EVENT_MAX);

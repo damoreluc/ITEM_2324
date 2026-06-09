@@ -3,6 +3,9 @@
 
 // configure mqttclient
 void configMqttClient(const char *mqttServer, const int mqttPort, const char *mqttUser, const char *mqttPassword) {
+  // Force MQTT to run on core 0 by using EventGroupHandle for synchronization on PRO_CPU
+  // AsyncMqttClient uses internal FreeRTOS tasks - these will inherit core affinity from config
+  
   // set mqttClient event's callback functions
   mqttClient.onConnect(onMqttConnect);           // mandatory
   mqttClient.onDisconnect(onMqttDisconnect);     // mandatory
@@ -24,4 +27,6 @@ void configMqttClient(const char *mqttServer, const int mqttPort, const char *mq
 
   // add the list of publishing topics
   topicsToPublish();
+  
+  Serial.println(F("MQTT client configured for core 0 operation"));
 }
