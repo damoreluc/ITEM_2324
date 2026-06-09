@@ -77,6 +77,6 @@ MQTT reconnect timer created for core 0 operation
 - Il WiFi.setTxPower() riduce il rumore EMI che potrebbe influenzare gli ADC
 
 ## Riferimenti
-- [Arduino ESP32 Dual Core Documentation](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/freertos.html)
-- [ESP32 lwIP Configuration](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/network/lwip.html)
+- [Arduino ESP32 Dual Core Documentation](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/freertos.html)
+- [ESP32 lwIP Configuration](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/lwip.html)
 - [AsyncMqttClient Documentation](https://github.com/marvinroger/async-mqtt-client)
