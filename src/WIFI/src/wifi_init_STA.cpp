@@ -10,16 +10,15 @@ void initWiFi_STA()
   // CONFIG_LWIP_CORE=0, CONFIG_ESP_WIFI_TASK_CORE_ID=0, CONFIG_ESP_WIFI_TASK_AFFINITY=0x1
   WiFi.mode(WIFI_STA);
   
-  Serial.println(F("WiFi configured for core 0 operation"));
+  Serial.println(F("[WiFi] WiFi configured for core 0 operation"));
 
-  // gestione degli eventi WiFi
-  WiFi.onEvent(WiFiEvent, WiFiEvent_t::ARDUINO_EVENT_MAX);
-  // WiFi.onEvent(WiFiStationConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
-  // WiFi.onEvent(WiFiGotIP, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);
+  // Register only the callbacks needed by this project lifecycle.
+  WiFi.onEvent(WiFiStationConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
+  WiFi.onEvent(WiFiGotIP, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);
   WiFi.onEvent(WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.println(F("Connecting to WiFi "));
+  Serial.println(F("[WiFi] Connecting to WiFi "));
 
   if (getSensMode() == REAL_DATA)
   {

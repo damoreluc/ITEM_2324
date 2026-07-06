@@ -242,6 +242,9 @@
 #include <APPLICATION/ISR/isr.h>
 #include <APPLICATION/boot.h>
 #include <APPLICATION/AUXDIN/aux_din.h>
+#include <debug/debug_task.h>
+
+TaskHandle_t debugTaskHandle = NULL;
 
 // uncomment this #define to print fft components
 // #define PRINT_COMPONENTS
@@ -401,6 +404,26 @@ void setup()
       {
         ssd1306_publish("Error on sampleMCP3204\n");
       }
+      yield();
+    }
+  }
+
+  // Create periodic debug diagnostic task
+  xReturned = xTaskCreatePinnedToCore(
+      debugTask,        // function that implements the task
+      "debugTask",     // name for the task
+      2048,             // task size
+      NULL,             // parameter passed into the task
+      1,                // task priority
+      &debugTaskHandle, // the task's handle
+      PRO_CPU_NUM       // pinned to core 0
+  );
+
+  if (xReturned != pdPASS)
+  {
+    Serial.println(F("Error creating the task debugTask"));
+    while (1)
+    {
       yield();
     }
   }

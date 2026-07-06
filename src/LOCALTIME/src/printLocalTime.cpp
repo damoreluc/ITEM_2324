@@ -6,8 +6,8 @@ void printLocalTime()
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo))
   {
-    Serial.println(F("Failed to obtain time"));
+    Serial.println(F("[NTP] Failed to obtain time"));
     return;
   }
-  Serial.println(&timeinfo, "%A %d %B %Y %H:%M:%S");
+  Serial.println(&timeinfo, "[NTP] %A %d %B %Y %H:%M:%S");
 }

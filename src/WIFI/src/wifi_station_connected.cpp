@@ -4,5 +4,5 @@
 void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info)
 {
     // digitalWrite(pinWiFiConnected, HIGH);
-    Serial.println(F("Connected to AP successfully!"));
+    Serial.println(F("[WiFi] Connected to AP successfully!"));
 }
