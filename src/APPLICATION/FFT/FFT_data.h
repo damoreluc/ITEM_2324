@@ -25,8 +25,8 @@ extern float m[FFT_SIZE >> 1];
 // parametri per il calcolo della FFT
 extern fft_config_t *real_fft_plan;
 
-// puntatore al buffer dei dati in ingresso per FFT
-// viene inizializzato nella funzione process, allo stato
+// pointer to FFT input data buffer for FFT
+// initialized in process() function, in state
 extern IRAM_ATTR float *pInput;
 
 #endif

@@ -4,13 +4,13 @@
 #include <Arduino.h>
 #include <APPLICATION\HWCONFIG\hwConfig.h>
 
-// modalità generazione dei dati
+// data generation mode
 typedef enum {REAL_DATA, SYM_DATA} eSensMode;
 
-// acquisisce il pin SENS_MODE e aggiorna lo stato dati_simulati/dati_reali
+// reads SENS_MODE pin and updates simulated_data/real_data state
 void readSensMode();
 
-// fornisce lo stato dati_simulati/dati_reali
+// returns simulated_data/real_data state
 eSensMode getSensMode();
 
 #endif

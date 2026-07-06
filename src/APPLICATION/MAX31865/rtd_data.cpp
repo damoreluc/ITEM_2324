@@ -18,7 +18,7 @@ Adafruit_MAX31865 RTD1 = Adafruit_MAX31865(CS1_MAX31865);
 // spi module: VSPI (MISO = GPIO19, MOSI = GPIO23, SCK = GPIO18)
 Adafruit_MAX31865 RTD2 = Adafruit_MAX31865(CS2_MAX31865);
 
-// inizializzazione moduli RDT1 e RTD2
+// RTD1 and RTD2 module initialization
 void setupRTD()
 {
   // setup RTD1 object: set to 2WIRE, 3WIRE or 4WIRE as necessary

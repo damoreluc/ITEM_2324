@@ -3,7 +3,7 @@
 #include <APPLICATION\MCP3204\mcp3204_data.h>
 #include <APPLICATION\HWCONFIG\hwConfig.h>
 
-// handle del task di acquisizione con MCP3204
+// MCP3204 acquisition task handle
 TaskHandle_t sampleMCP3204TaskHandle;
 
 // speed/torque acquisition task ------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 #include <APPLICATION/TASK/task.h>
 #include <APPLICATION/FSM/fsm.h>
 
-// handle del task di acquisizione dati ed elaborazione FFT
+// data acquisition and FFT processing task handle
 TaskHandle_t processTaskHandle;
 
 // index of PGA MCP6S26 current channel

@@ -62,9 +62,9 @@ float mcp3204_getVoltage(SPIClass &hwspi, uint8_t cs, uint8_t channel) {
 // VARIANTE della mcp3204_getAllVoltage
 // uso il metodo  void transferBytes(const uint8_t * data, uint8_t * out, uint32_t size)
 // dove:
-//  const uint8_t * data            è l'array dei byte da inviare allo slave
-//  uint8_t * out                   è l'array dei byte trasmessi dallo slave, stessa dimensione del precedente
-//  uint32_t size                   è il numero di byte da scambiare
+//  const uint8_t * data            is the byte array to send to the slave
+//  uint8_t * out                   is the byte array transmitted by the slave, same size as above
+//  uint32_t size                   is the number of bytes to exchange
 
 void mcp3204_getAllVoltage(SPIClass &hwspi, uint8_t cs, mcp3204Data *data) {
 

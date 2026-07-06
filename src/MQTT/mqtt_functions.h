@@ -34,7 +34,11 @@ extern AsyncMqttClient mqttClient;
 extern TimerHandle_t mqttReconnectTimer;
 
 // configure mqttclient
-void configMqttClient(const char *mqttServer, const int mqttPort, const char *mqttUser, const char *mqttPassword);
+void configMqttClient(const char *mqttServer,
+                      const int mqttPort,
+                      const char *mqttUser,
+                      const char *mqttPassword,
+                      const char *mqttClientId);
 
 // add a new topic to the subscribed list (return TRUE on success)
 bool AddSubscribedTopic(const char* topic, uint8_t qos);

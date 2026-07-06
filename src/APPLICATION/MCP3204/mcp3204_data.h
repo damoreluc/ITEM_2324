@@ -10,7 +10,7 @@ extern mcp3204Data mcp3204_dati;
 
 extern float mcp3204buffer[MCP3204_BUFFER_SIZE];
 
-// coda per conteggio accessi ADC dei sensori di coppia
+// queue for ADC access counter of torque sensors
 extern QueueHandle_t xQueueCountADCTorque;
 
 #endif

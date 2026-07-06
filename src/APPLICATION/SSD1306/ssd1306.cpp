@@ -15,9 +15,9 @@ QueueHandle_t xQueueMsgU8G2;
 // allocate memory
 uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
 
-// handle del task di stampa display SSD1306
+// SSD1306 display print task handle
 TaskHandle_t u8logTaskHandle;
-// task di stampa display SSD1306
+// SSD1306 display print task
 void u8logTask(void *pvParameters);
 
 // display setup
@@ -34,10 +34,10 @@ void ssd1306_log_setup()
     // 0: Update screen with newline, 1: Update screen for every char
     u8g2log.setRedrawMode(0);
 
-    // creazione coda per pubblicazione messaggi SSD1306
+    // create queue for SSD1306 message publishing
     xQueueMsgU8G2 = xQueueCreate(10, (U8LOG_WIDTH + 1) * sizeof(uint8_t));
 
-  // crea il task di pubblicazione dei messaggi su display SSD1306
+  // create task that publishes messages to SSD1306 display
    BaseType_t xReturned;
   xReturned = xTaskCreatePinnedToCore(
       u8logTask,         // function that implements the task
@@ -59,7 +59,7 @@ void ssd1306_log_setup()
 }
 
 //-----------------------------------------------------------------------------
-// task di stampa display SSD1306
+// SSD1306 display print task
 void u8logTask(void *pvParameters)
 {
     char temp[U8LOG_WIDTH + 1]="";

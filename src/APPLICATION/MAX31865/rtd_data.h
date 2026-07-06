@@ -18,7 +18,7 @@ extern stRTD temperature;
 // coda per temperature RTD
 extern QueueHandle_t xQueueRTD;
 
-// inizializzazione moduli RDT1 e RTD2
+// RTD1 and RTD2 module initialization
 void setupRTD();
 
 // lettura RTD1 ed RTD2 e inserimento dati in xQueueRTD ogni RTD_PERIOD ms

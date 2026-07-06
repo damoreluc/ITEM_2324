@@ -24,6 +24,6 @@ float fundamental_freq = 0;
 // parametri per il calcolo della FFT
 fft_config_t *real_fft_plan;
 
-// puntatore al buffer dei dati in ingresso per FFT
-// viene inizializzato nella funzione process, allo stato
+// pointer to FFT input data buffer for FFT
+// initialized in process() function, in state
 IRAM_ATTR float *pInput;

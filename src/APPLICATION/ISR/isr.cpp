@@ -8,7 +8,7 @@ portMUX_TYPE countDataMux = portMUX_INITIALIZER_UNLOCKED;
 // ISR for the management of the arrival of a new sample on the DRDY falling edge
 // uses the xQueueADS1256Sample queue to tell the fsm the index of the sample to be scanned
 
-// provare ad usare taskNotify per sincronizzare l'acquisizione tra questa ISR e la FSM nello stato Sampling
+// try using taskNotify to synchronize acquisition between this ISR and FSM in Sampling state
 void IRAM_ATTR ISR_DRDY()
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;

@@ -15,8 +15,8 @@ typedef struct
 extern stPGA pga0;
 
 // comando del guadagno del PGA
-// è arrivato un messaggio da pgaSetGainTopic
-// deve essere un valore tra 0 e 7; forzato a 0 se esterno all'intervallo o valore non numerico
+// a message was received from pgaSetGainTopic
+// must be a value between 0 and 7; forced to 0 if out of range or non-numeric
 void setPGAgain(char *data);
 
 #endif

@@ -3,18 +3,20 @@
 
 #include <Arduino.h>
 #include <dependencies/Dictionary/Dictionary.h>
-#include <MQTT/custom/clientID.h>
 
-//Dizionario dei subscribed topics (topic in ingresso alla ESP32)
+// Dictionary of subscribed topics (incoming topics for ESP32)
 extern Dictionary<String, String> subscribedTopics;
 
-//Dizionario dei published topics (topic in uscita dalla ESP32)
+// Dictionary of published topics (outgoing topics from ESP32)
 extern Dictionary<String, String> publishedTopics;
 
-// compila il dizionario dei subscribed topics (da personalizzare)
+// prefisso runtime dei topic MQTT (di default "ItemCV")
+void setTopicPrefix(const char *topicPrefix);
+
+// builds the subscribed topics dictionary (customizable)
 void compileSubTopics(Dictionary<String, String> &subTopics);
 
-// compila il dizionario dei published topics (da personalizzare)
+// builds the published topics dictionary (customizable)
 void compilePubTopics(Dictionary<String, String> &pubTopics);
 
 

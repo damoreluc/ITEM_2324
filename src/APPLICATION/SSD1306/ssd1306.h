@@ -3,7 +3,7 @@
 #include <U8g2lib.h>
 
 /*
- *  Mappa interfacciamento con display oled SSD1306 su I2C
+ *  Interface map with SSD1306 OLED display on I2C
  *    SSD106            ESP32
  *    GND               GND 
  *    Vcc               +3.3V

@@ -9,10 +9,10 @@
 #include <APPLICATION\FSM\fsm.h>
 #include <APPLICATION/AUXDIN/aux_din.h>
 
-// handle del task di pubblicazione FFT
+// FFT publishing task handle
 TaskHandle_t publishTaskHandle;
 
-// task pubblicazione FFT
+// FFT publishing task
 void publishFFT(void *pvParameters)
 {
   while (1)
@@ -96,7 +96,7 @@ void publishFFT(void *pvParameters)
         uint32_t now = millis();
         elapsedTime = now - begin;
 
-        // pubblicazione degli eventuali dati delle RTD
+        // publish RTD data when available
         if (xQueueRTD != NULL)
         {
           stRTD temp;
@@ -106,7 +106,7 @@ void publishFFT(void *pvParameters)
           {
             xQueueReceive(xQueueRTD, &(temp), portMAX_DELAY);
 
-            // pubblicazione valore RTD1
+            // publish RTD1 value
             sprintf(s, "%.3f", temp.rtd1);
             {
               uint32_t mqtt_timeout = millis();
@@ -116,7 +116,7 @@ void publishFFT(void *pvParameters)
                 delay(10);
               } while (res == 0 && (millis() - mqtt_timeout) < MQTT_PUBLISH_TIMEOUT_MS);
             }
-            // pubblicazione stato RTD1
+            // publish RTD1 status
             {
               uint32_t mqtt_timeout = millis();
               do
@@ -126,7 +126,7 @@ void publishFFT(void *pvParameters)
               } while (res == 0 && (millis() - mqtt_timeout) < MQTT_PUBLISH_TIMEOUT_MS);
             }
 
-            // pubblicazione valore RTD2
+            // publish RTD2 value
             sprintf(s, "%.3f", temp.rtd2);
             {
               uint32_t mqtt_timeout = millis();
@@ -136,7 +136,7 @@ void publishFFT(void *pvParameters)
                 delay(10);
               } while (res == 0 && (millis() - mqtt_timeout) < MQTT_PUBLISH_TIMEOUT_MS);
             }
-            // pubblicazione stato RTD2
+            // publish RTD2 status
             {
               uint32_t mqtt_timeout = millis();
               do
@@ -148,7 +148,7 @@ void publishFFT(void *pvParameters)
           }
         }
 
-        // pubblicazione conteggio accessi ADC
+        // publish ADC access counter
         if (xQueueCountADCTorque != NULL)
         {
           uint32_t nadc;
@@ -169,7 +169,7 @@ void publishFFT(void *pvParameters)
           }
         }
 
-        // pubblicazione dati mcp3204 mcp3204buffer[MCP3204_BUFFER_SIZE]
+        // publish MCP3204 data mcp3204buffer[MCP3204_BUFFER_SIZE]
         {
           uint32_t mqtt_timeout = millis();
           do
@@ -179,7 +179,7 @@ void publishFFT(void *pvParameters)
           } while (res == 0 && (millis() - mqtt_timeout) < MQTT_PUBLISH_TIMEOUT_MS);
         }
 
-        // pubblica lo stato dell'ingresso ausiliario aux_din
+        // publish aux_din auxiliary input status
         if (aux_din_status)
         {
           res = mqttClient.publish(publishedTopics.get("auxdinTopic").c_str(), 0, false, "true");
@@ -189,7 +189,7 @@ void publishFFT(void *pvParameters)
           res = mqttClient.publish(publishedTopics.get("auxdinTopic").c_str(), 0, false, "false");
         }
       }
-      // sblocca il task di elaborazione, l'array output è libero
+      // unlock processing task, output array is free
       xTaskNotifyGive(processTaskHandle);
     }
   }

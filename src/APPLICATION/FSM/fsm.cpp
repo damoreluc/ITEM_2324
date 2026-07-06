@@ -17,7 +17,7 @@ static uint64_t last = millis();
 static uint64_t lastFFT;
 static uint16_t sampleCounter = 0; // number of samples gathered
 static uint32_t numberOfAds1256Cycles = 0;
-static uint32_t countADCTorque = 0; // conteggio accessi ADC sensori di coppia
+static uint32_t countADCTorque = 0; // ADC access counter for torque sensors
 float adcValue;
 float meanValue = 0.0;
 int kk;
@@ -29,13 +29,13 @@ uint32_t QueueLength, maxQueueLength = 0;
 
 tMode triggered = Stop;
 
-// flag true quando i dati sono pronti
+// true when data is ready
 volatile bool dataReady = false;
 
-// stato della MSF
+// MSF state
 volatile tStati _stato = WaitTrigger;
 
-// stampa stato attuale ---------------------------------------------------------------------------
+// print current state ---------------------------------------------------------------------------
 void DebugCurrentStatus(tStati st)
 {
     static tStati pst = Sampling; // initialize with any value different from WaitTrigger
@@ -58,7 +58,7 @@ void fsm()
         // sets the current channel of the ADC
         // Serial.printf("Channel: %d\n", MCP6S26_current_channel_index);
 
-        // inizializzazione fft
+        // FFT initialization
         if (real_fft_plan == NULL)
         {
             Serial.println(F("Inizializzazione FFT"));
@@ -120,7 +120,7 @@ void fsm()
 
     case Sampling:
         // Acquiring Accelerometer samples from the ADS1256 ADC
-        // provare usare taskNotify per sincronizzare l'acquisizione tra la ISR e la FSM nello stato Sampling
+        // try using taskNotify to synchronize acquisition between ISR and FSM in Sampling state
         if (getSensMode() == REAL_DATA)
         {
             int32_t sampleFromISR;

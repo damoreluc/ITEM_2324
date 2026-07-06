@@ -95,12 +95,12 @@ void WiFiEvent(WiFiEvent_t event)
             sprintf(s, "IP %s\n", WiFi.localIP().toString().c_str());
             ssd1306_publish(s);
         }
-        // operazioni da compiere sui layers superiori dopo che il layer IP è pronto
+        // operations to perform on upper layers after IP layer is ready
         WiFiNetworkReady();
         break;
     case ARDUINO_EVENT_WIFI_STA_LOST_IP:
         Serial.println(F("[WiFi] Lost IP address and IP address is reset to 0"));
-        // operazioni da compiere sui layers superiori se il layer IP è caduto
+        // operations to perform on upper layers if IP layer is down
         WiFiNetworkFail();
         break;
     case ARDUINO_EVENT_WPS_ER_SUCCESS:

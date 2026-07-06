@@ -7,7 +7,7 @@
 // ✅ FIX #6: Spinlock for countData synchronization between ISR and FSM
 extern portMUX_TYPE countDataMux;
 
-// ISR per la gestione dell'arrivo di un nuovo campione sul fronte di discesa di DRDY
+// ISR that handles the arrival of a new sample on DRDY falling edge
 void IRAM_ATTR ISR_DRDY();
 
 #endif

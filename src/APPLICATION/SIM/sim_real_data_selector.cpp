@@ -2,7 +2,7 @@
 
 eSensMode sensMode = SYM_DATA;
 
-// acquisisce il pin SENS_MODE e aggiorna lo stato dati_simulati/dati_reali
+// reads SENS_MODE pin and updates simulated_data/real_data state
 void readSensMode()
 {
     pinMode(SENS_MODE, INPUT_PULLUP);
@@ -15,7 +15,7 @@ void readSensMode()
     }
 }
 
-// fornisce lo stato dati_simulati/dati_reali
+// returns simulated_data/real_data state
 eSensMode getSensMode()
 {
     return sensMode;

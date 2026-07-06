@@ -21,7 +21,7 @@ uint8_t pga0_channels[2] = {MCP6S26_CH1, MCP6S26_CH3};
 
 // initial setup
 void mcp6s26_setup() {
-    // impostazione iniziale PGA0 esterno
+    // initial setup for external PGA0
     pinMode(CS_PGA0, OUTPUT);
     mcp6s26_setChannel(vspi, CS_PGA0, pga0.channel);
     mcp6s26_setGain(vspi, CS_PGA0, pga0.gain);

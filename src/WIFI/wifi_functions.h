@@ -2,32 +2,49 @@
 #define _WIFI_FUNCTIONS_H
 
 #include <Arduino.h>
-#include <WIFI/credentials.h>
 #include <WiFi.h>
 #include <APPLICATION/SSD1306/ssd1306.h>
 #include <APPLICATION\SIM\sim_real_data_selector.h>
 
-// configura il modulo WiFi come STATION
-// e si connette ad un Access Point con le credenziali
-// definite nel file credentials.h
+typedef struct stMqttRuntimeConfig
+{
+	char broker[64];
+	uint16_t port;
+	char user[64];
+	char password[64];
+	char clientId[32];
+} stMqttRuntimeConfig;
+
+// avvia provisioning bloccante con WiFiManager e carica i parametri MQTT
+// when it returns true, the device is connected to WiFi and config is ready
+bool runWiFiManagerBlocking(stMqttRuntimeConfig &cfg,
+														const char *defaultBroker,
+														uint16_t defaultPort,
+														const char *defaultUser,
+														const char *defaultPassword,
+														const char *defaultClientId);
+
+// configures WiFi module as STATION
+// and connects to an Access Point with credentials
+// stored in persistent WiFi stack configuration
 void initWiFi_STA();
 
-// Gestione degli eventi del WiFi
+// WiFi event handling
 void WiFiEvent(WiFiEvent_t event);
 
-// Stampa l'indirizzo IP ottenuto
+// Prints the obtained IP address
 void WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info);
 
-// Stampa la conferma di connessione all'access point
+// Prints confirmation of access-point connection
 void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info);
 
-// Gestione della disconnessione e tentativo di riconnessione
+// Handles disconnection and reconnection attempt
 void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info);
 
-// Operazioni dei layer superiori da compiere quando è pronto il layer IP
+// Operations to perform on upper layers when IP layer is ready
 void WiFiNetworkReady();
 
-// Operazioni da compiere sui layers superiori se il layer IP è caduto
+// Operations to perform on upper layers when IP layer is down
 void WiFiNetworkFail();
 
 #endif

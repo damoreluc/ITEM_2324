@@ -1,9 +1,9 @@
 #include <WIFI/wifi_functions.h>
 #include <MQTT/mqtt_functions.h>
 
-// Operazioni da compiere sui layers superiori se il layer IP è caduto
+// Operations to perform on upper layers when IP layer is down
 void WiFiNetworkFail() {
-    // ferma il monitoraggio della connessione MQTT mentre 
-    // la connessione WiFi è in fase di ripristino
+    // stop MQTT connection monitoring while 
+    // WiFi connection is being restored
     stopTimersRTOS();
 }

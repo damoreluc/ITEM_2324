@@ -1,8 +1,8 @@
 #include <MQTT/custom/custom.h>
 #include <MQTT/custom/mqtt_topics.h>
 
-// carica la lista dei topics su cui si andrà a pubblicare
-// Viene richiamata nella configMqttClient()
+// loads the list of topics used for publishing
+// Called by configMqttClient()
 void topicsToPublish() {
   // build the publishing topics dictionary
   compilePubTopics(publishedTopics);    

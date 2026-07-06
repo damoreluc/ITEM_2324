@@ -8,8 +8,8 @@ uint8_t gainValues[] = {1, 2, 4, 5, 8, 10, 16, 32};
 stPGA pga0 = {.channel = MCP6S26_CH1, .gain = MCP6S26_GAIN_1, .gainValue=gainValues[MCP6S26_GAIN_1] , .gain_changed = true};
 
 // comando del guadagno del PGA
-// è arrivato un messaggio da pgaSetGainTopic
-// deve essere un valore tra 0 e 7; forzato a 0 se esterno all'intervallo o valore non numerico
+// a message was received from pgaSetGainTopic
+// must be a value between 0 and 7; forced to 0 if out of range or non-numeric
 void setPGAgain(char *data)
 {
     uint8_t g;
@@ -18,7 +18,7 @@ void setPGAgain(char *data)
     //Serial.print("pga data sel: ");
     //Serial.println(data);
 
-    // se il payload MQTT contiene più di una cifra
+    // if MQTT payload contains more than one digit
     // forza il PGA al guadagno minimo
     if (strlen(data) > 1)
     {
@@ -29,8 +29,8 @@ void setPGAgain(char *data)
         k = data[0] - '0';
     }
     
-    // k deve essere un valore tra 0 e 7; 
-    // forzato a 0 se esterno all'intervallo o valore non numerico
+    // k must be between 0 and 7; 
+    // forced to 0 if out of range or non-numeric
     if (k < 0 || k > (sizeof(MCP6S26_gains) - 1))
     {
         g = MCP6S26_gains[0];

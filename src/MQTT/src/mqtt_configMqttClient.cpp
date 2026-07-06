@@ -2,7 +2,11 @@
 #include <MQTT/custom/custom.h>
 
 // configure mqttclient
-void configMqttClient(const char *mqttServer, const int mqttPort, const char *mqttUser, const char *mqttPassword) {
+void configMqttClient(const char *mqttServer,
+                      const int mqttPort,
+                      const char *mqttUser,
+                      const char *mqttPassword,
+                      const char *mqttClientId) {
   // Force MQTT to run on core 0 by using EventGroupHandle for synchronization on PRO_CPU
   // AsyncMqttClient uses internal FreeRTOS tasks - these will inherit core affinity from config
   
@@ -15,7 +19,9 @@ void configMqttClient(const char *mqttServer, const int mqttPort, const char *mq
   mqttClient.onPublish(onMqttPublish);           // optional (publishing acknowledged)
   
   // set Client ID
-  mqttClient.setClientId(thisClient);
+  mqttClient.setClientId(mqttClientId);
+  // keep topic prefix aligned with runtime client ID
+  setTopicPrefix(mqttClientId);
   // set MQTT broker server
   mqttClient.setServer(mqttServer, mqttPort);
 

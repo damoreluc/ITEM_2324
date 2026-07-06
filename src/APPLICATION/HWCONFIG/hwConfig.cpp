@@ -2,8 +2,8 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-// canale SPI per connessione con ADC ADS1256 ----------------------------------------
+// SPI channel connected to ADS1256 ADC ----------------------------------------
 SPIClass hspi = SPIClass(HSPI);
 
-// canale SPI per connessione con ADC MCP3204 ----------------------------------------
+// SPI channel connected to MCP3204 ADC ----------------------------------------
 SPIClass vspi = SPIClass(VSPI);

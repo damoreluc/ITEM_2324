@@ -12,9 +12,9 @@ ADS1256Ext::ADS1256Ext() : ADS1256() {}
 
 // initial setup
 void ADS1256Ext::setup() {
-    // configurazione iniziale ADC accelerometri ADS1256
+    // initial ADS1256 accelerometer ADC setup
     // imposta la isr dedicata al data ready dell'ADC ADS1256, triggerata sul fronte di discesa dell'interrupt
-    // configurazione dell'ADS1256 e delle sue linee di controllo
+    // ADS1256 and control-line configuration
     //  NB: SPI clock <= F_clkin / 4 = 7.68e6 / 4 = 1920000
     adc.init(hspi, nCS, nDRDY, nPDWN, 1900000);
     // mux between accelerometer channels now is done by PGA

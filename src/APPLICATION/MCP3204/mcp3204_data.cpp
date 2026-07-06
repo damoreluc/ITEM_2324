@@ -2,8 +2,8 @@
 
 // MCP3204 ADC output data
 mcp3204Data mcp3204_dati;
-// array dei campionamenti con MCP3204 (4 blocchi sequenziali)
+// MCP3204 sampled data array (4 sequential blocks)
 float mcp3204buffer[MCP3204_BUFFER_SIZE];
 
-// coda per conteggio accessi ADC dei sensori di coppia
+// queue for ADC access counter of torque sensors
 QueueHandle_t xQueueCountADCTorque;

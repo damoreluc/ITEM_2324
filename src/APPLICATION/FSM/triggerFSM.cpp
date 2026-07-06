@@ -2,8 +2,8 @@
 #include <APPLICATION\SIM\sim_real_data_selector.h>
 #include <APPLICATION/SSD1306/ssd1306.h>
 
-// comando della MSF di acquisizione
-// è arrivato un messaggio MQTT da triggerTopic
+// acquisition FSM command
+// a MQTT message was received from triggerTopic
 // ( 0 = Stop, 1 = OneShot, 2 = FreeRun )
 void triggerFSM(char *data)
 {

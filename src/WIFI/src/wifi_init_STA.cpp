@@ -3,7 +3,7 @@
 
 void initWiFi_STA()
 {
-  // comanda un led per indicare la connessione all'access point WiFi
+  // drives an LED to indicate WiFi access point connection
   // pinMode(pinWiFiConnected, OUTPUT);
 
   // WiFi is configured to run on core 0 (PRO_CPU) via platformio.ini build flags:
@@ -17,7 +17,15 @@ void initWiFi_STA()
   WiFi.onEvent(WiFiGotIP, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);
   WiFi.onEvent(WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
 
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    Serial.println(F("[WiFi] Already connected"));
+    WiFiNetworkReady();
+    return;
+  }
+
+  // Connect with credentials already stored by WiFiManager/SDK.
+  WiFi.begin();
   Serial.println(F("[WiFi] Connecting to WiFi "));
 
   if (getSensMode() == REAL_DATA)

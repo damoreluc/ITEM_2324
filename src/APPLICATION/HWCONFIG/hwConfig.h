@@ -15,14 +15,14 @@
 // Note: GPIO2 on ESP32 DevKit
 #define LED_BUILTIN GPIO_NUM_2
 
-// pin di selezione hardware della modalità di generazione dei dati (simulati o dai sensori fisici)
+// hardware selection pin for data generation mode (simulated or from physical sensors)
 #define SENS_MODE GPIO_NUM_32
 
-// ingresso digitale ausiliario, optoisolato
+// auxiliary opto-isolated digital input
 #define AUX_DIN GPIO_NUM_33
 
 /*
- *  Mappa interfacciamento con scheda ADS1256
+ *  Interface map with ADS1256 board
  *    ADS1256           ESP32
  *    +5V               +5V
  *    GND               GND
@@ -39,7 +39,7 @@
 #define nPDWN GPIO_NUM_26
 
 /*
- *  Mappa intefacciamento PGA MCP6S26
+ *  Interface map for MCP6S26 PGA
  *    MCP6S26          ESP32
  *    VDD               +5V
  *    GND               GND
@@ -52,7 +52,7 @@
 #define CS_PGA0 GPIO_NUM_16
 
 /*
- *  Mappa interfacciamento con scheda MAX31865 per RTD1
+ *  Interface map with MAX31865 board for RTD1
  *    MAX31865          ESP32
  *    VIN               +3.3V
  *    GND               GND
@@ -65,7 +65,7 @@
 #define CS1_MAX31865 GPIO_NUM_17
 
 /*
- *  Mappa interfacciamento con scheda MAX31865 per RTD2
+ *  Interface map with MAX31865 board for RTD2
  *    MAX31865          ESP32
  *    VIN               +3.3V
  *    GND               GND
@@ -78,7 +78,7 @@
 #define CS2_MAX31865 GPIO_NUM_27
 
 /*
- *  Mappa interfacciamento con ADC MCP3204 per coppie e velocità
+ *  Interface map with MCP3204 ADC for torque and speed
  *    MCP3204           ESP32
  *    VIN               +3.3V
  *    GND               GND
@@ -89,24 +89,24 @@
  */
 // MCP3204 ADC chip select
 #define CS_MCP3204 GPIO_NUM_5
-// MCP3204 canale coppia 1
+// MCP3204 torque channel 1
 #define MCP3204_Torque1 0
-// MCP3204 canale coppia 2
+// MCP3204 torque channel 2
 #define MCP3204_Torque2 1
-// MCP3204 canale velocità 1
+// MCP3204 speed channel 1
 #define MCP3204_Speed1 2
-// MCP3204 canale velocità 2
+// MCP3204 speed channel 2
 #define MCP3204_Speed2 3
 // MCP3204 analog Vref
 #define MCP3204_VREF 2.50
 
-// // indicatore stato connessione WiFi
+// // WiFi connection status indicator
 // #define pinWiFiConnected GPIO_NUM_23
 
-// canale SPI per connessione con ADC ADS1256 ----------------------------------------
+// SPI channel connected to ADS1256 ADC ----------------------------------------
 extern SPIClass hspi;
 
-// canale SPI per connessione con ADC MCP3204/RTD/PGA --------------------------------
+// SPI channel connected to MCP3204/RTD/PGA ADC --------------------------------
 extern SPIClass vspi;
 
 // -----------------------------------------------------------------------------------

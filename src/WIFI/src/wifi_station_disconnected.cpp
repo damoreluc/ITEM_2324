@@ -12,5 +12,4 @@ void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info)
     Serial.println(info.wifi_sta_disconnected.reason);
     Serial.println(F("Trying to Reconnect"));
     WiFi.reconnect();
-    //WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 }
