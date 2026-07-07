@@ -20,6 +20,7 @@
 #include <WiFi.h>
 #include <WIFI/wifi_functions.h>
 #include <MQTT/mqtt_functions.h>
+#include <MQTT/ClientID.h>
 #include <MQTT/custom/custom.h>
 
 // other libraries required by the specific application
@@ -49,7 +50,6 @@
 
 TaskHandle_t debugTaskHandle = NULL;
 stMqttRuntimeConfig mqttRuntimeConfig = {};
-static const char *defaultMqttClientId = "ItemCV";
 
 // uncomment this #define to print fft components
 // #define PRINT_COMPONENTS
@@ -82,7 +82,7 @@ void setup()
                               (uint16_t)mqttPort,
                               mqttUser,
                               mqttPassword,
-                              defaultMqttClientId))
+                              kDefaultMqttClientId))
   {
     Serial.println(F("[BOOT] WiFiManager provisioning failed"));
     while (1)

@@ -87,11 +87,11 @@ Nel file `main.cpp` includere __il solo__ file prescelto di accesso al broker, a
 
 ## Identificativo MQTT della scheda ESP32
 
-Nel file `src\MQTT\custom\clientID.h` è definita la tag `thisClient` che identifica tutti i messaggi MQTT pubblicati da o destinati a questa scheda di acquisizione. Modificarlo in base alle proprie esigenze.
+Nel file `src\MQTT\ClientID.h` è definita la variabile `kDefaultMqttClientId` che identifica tutti i messaggi MQTT pubblicati da o destinati a questa scheda di acquisizione. Modificarla in base alle proprie esigenze e ricompilare il progetto. Ad esempio, per la scheda di Udine utilizzare la versione suggerita qui sotto:
 
 ```C
-// MQTT client ID
-#define thisClient "ESP32DevKit123" //"ESP32Udine"
+// Default MQTT client ID shared across modules.
+static const char kDefaultMqttClientId[] = "ItemUD";
 
 ```
 
@@ -100,7 +100,7 @@ Nel file `src\MQTT\custom\clientID.h` è definita la tag `thisClient` che identi
 L'elenco di tutti i topics è dichiarato nel file `mqtt_topics.cpp`  
 in questo file modificare o aggiungere solo il nome del topic, non rimuovere la tag **_thisClient_**
 
-Ogni topic è nella forma sintattica: `identificativo_MQTT_scheda/nome_topic` ad esempio: `ESP32DevKit123/trigger`
+Ogni topic è nella forma sintattica: `ClientID/nome_topic` ad esempio: `ItemCV/trigger`
 
 **Nota:** il testo dei topics è _case sensitive_.
 
@@ -133,8 +133,9 @@ La scheda ESP32 comunica la telemetria attraverso i seguenti _published topics_ 
 
 Nella funzione `setup()` è importante rispettare la sequenza di operazioni:
 
-1. configurare tutti i dispositivi hardware
-2. assegnare i valori predefiniti a variabili/oggetti della applicazione
-3. creare eventuali task RTOS
-4. configurare il client MQTT con `configMqttClient(mqttServer, mqttPort, mqttUser, mqttPassword);`
-5. avviare il sotto sistema WiFi con `initWiFi_STA();`
+1. attivare WiFiManager per l'impostazione dei parametri WiFi e MQTT se assenti
+2. configurare tutti i dispositivi hardware
+3. assegnare i valori predefiniti a variabili/oggetti della applicazione
+4. creare eventuali task RTOS
+5. configurare il client MQTT con `configMqttClient(mqttServer, mqttPort, mqttUser, mqttPassword);`
+6. avviare il sotto sistema WiFi con `initWiFi_STA();`

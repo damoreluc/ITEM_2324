@@ -10,7 +10,7 @@ extern Dictionary<String, String> subscribedTopics;
 // Dictionary of published topics (outgoing topics from ESP32)
 extern Dictionary<String, String> publishedTopics;
 
-// prefisso runtime dei topic MQTT (di default "ItemCV")
+// prefisso runtime dei topic MQTT (default definito in MQTT/ClientID.h)
 void setTopicPrefix(const char *topicPrefix);
 
 // builds the subscribed topics dictionary (customizable)

@@ -1,4 +1,5 @@
 #include <MQTT/custom/mqtt_topics.h>
+#include <MQTT/ClientID.h>
 
 // Dictionary of subscribed topics (incoming topics for ESP32)
 Dictionary<String, String> subscribedTopics = Dictionary<String, String>();
@@ -6,7 +7,7 @@ Dictionary<String, String> subscribedTopics = Dictionary<String, String>();
 // Dictionary of published topics (outgoing topics from ESP32)
 Dictionary<String, String> publishedTopics = Dictionary<String, String>();
 
-static String gTopicPrefix = "ItemCV";
+static String gTopicPrefix = kDefaultMqttClientId;
 
 void setTopicPrefix(const char *topicPrefix)
 {
