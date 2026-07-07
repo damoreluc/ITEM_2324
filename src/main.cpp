@@ -68,15 +68,25 @@ void setup()
   readSensMode();
 
   Serial.begin(115200);
+
+  // OLED display setup
+  ssd1306_log_setup();
+
   delay(500);
 
 #ifdef RESET_NETWORK_PARAMETERS
   // debug: reset all saved network parameters (WiFi + MQTT) to force reprovisioning
   Serial.println("[Setup] reset all saved network parameters to force reprovisioning");
+  ssd1306_publish("Reset parameters\n");
   resetSavedNetworkParameters();
 #endif
 
   // Run WiFiManager first (blocking) before allocating the rest of application memory.
+  ssd1306_publish("WiFiManager\n");
+  ssd1306_publish("SSID: ITEM_ConfigAP\n");
+  ssd1306_publish("web portal IP\n");
+  ssd1306_publish("  192.168.4.1\n");
+
   if (!runWiFiManagerBlocking(mqttRuntimeConfig,
                               mqttServer,
                               (uint16_t)mqttPort,
@@ -85,11 +95,15 @@ void setup()
                               kDefaultMqttClientId))
   {
     Serial.println(F("[BOOT] WiFiManager provisioning failed"));
+    ssd1306_publish("Provisioning failed\n");
     while (1)
     {
       delay(1000);
     }
   }
+
+  ssd1306_publish("Provisioning OK\n");
+  delay(5000);
 
   bootMsg(mqttRuntimeConfig.broker, subscribedTopics, publishedTopics);
 
@@ -114,7 +128,6 @@ void setup()
     aux_din_status = !digitalRead(AUX_DIN);
 
     // create ADS1256 equalization table
-    ssd1306_log_setup();
     ssd1306_publish("Create EQ table\n");
     Serial.println(F("Create ADS1256 equalization table"));
     create_equalizer(m);
