@@ -11,6 +11,9 @@
  * 5) initWiFi_STA() usa la configurazione WiFi persistita e gestisce gli eventi essenziali.
  */
 
+// use this flag to reset all stored network parameters and force reprovisioning
+#define RESET_NETWORK_PARAMETERS
+
 // Includes minimal libraries required
 #include <Arduino.h>
 #include <APPLICATION\HWCONFIG\hwConfig.h>
@@ -65,6 +68,13 @@ void setup()
   readSensMode();
 
   Serial.begin(115200);
+  delay(500);
+
+#ifdef RESET_NETWORK_PARAMETERS
+  // debug: reset all saved network parameters (WiFi + MQTT) to force reprovisioning
+  Serial.println("[Setup] reset all saved network parameters to force reprovisioning");
+  resetSavedNetworkParameters();
+#endif
 
   // Run WiFiManager first (blocking) before allocating the rest of application memory.
   if (!runWiFiManagerBlocking(mqttRuntimeConfig,

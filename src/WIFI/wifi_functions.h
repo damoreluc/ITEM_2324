@@ -24,6 +24,9 @@ bool runWiFiManagerBlocking(stMqttRuntimeConfig &cfg,
 														const char *defaultPassword,
 														const char *defaultClientId);
 
+// clears stored WiFi credentials (NVS) and MQTT parameters saved by WiFiManager flow
+bool resetSavedNetworkParameters();
+
 // configures WiFi module as STATION
 // and connects to an Access Point with credentials
 // stored in persistent WiFi stack configuration

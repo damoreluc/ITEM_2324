@@ -56,6 +56,28 @@ uint16_t parsePort(const char *portText, uint16_t fallback)
 }
 } // namespace
 
+bool resetSavedNetworkParameters()
+{
+  Preferences prefs;
+  if (!prefs.begin(kPrefsNamespace, false))
+  {
+    Serial.println(F("[WiFiManager] Failed to open preferences namespace"));
+    return false;
+  }
+
+  prefs.clear();
+  prefs.end();
+
+  WiFiManager wm;
+  wm.resetSettings();
+
+  // Clear STA config from NVS so next boot forces a full reprovisioning.
+  WiFi.disconnect(true, true);
+
+  Serial.println(F("[WiFiManager] Saved network parameters reset"));
+  return true;
+}
+
 bool runWiFiManagerBlocking(stMqttRuntimeConfig &cfg,
                             const char *defaultBroker,
                             uint16_t defaultPort,
