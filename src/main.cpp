@@ -12,7 +12,7 @@
  */
 
 // use this flag to reset all stored network parameters and force reprovisioning
-#define RESET_NETWORK_PARAMETERS
+//#define RESET_NETWORK_PARAMETERS
 
 // Includes minimal libraries required
 #include <Arduino.h>

@@ -261,9 +261,9 @@ void fsm()
         _stato = WaitTrigger;
 
         // print some task info
-        Serial.printf("Free heap: %d bytes \t", freeHeap);
-        Serial.printf("Max queue length: %d\n", maxQueueLength);
-        maxQueueLength = 0;
+        //Serial.printf("Free heap: %d bytes \t", freeHeap);
+        //Serial.printf("Max queue length: %d\n", maxQueueLength);
+        //maxQueueLength = 0;
         //       Serial.printf("Elapsed time: %d ms", elapsedTime);
         break;
 
